@@ -1,7 +1,9 @@
 package main
 
-import "github.com/JohannesF99/bkc-fundus-management/internal/member-service/rest"
+import (
+	"github.com/JohannesF99/bkc-fundus-management/internal/member-service"
+)
 
 func main() {
-	rest.StartMemberService()
+	member.StartMemberService()
 }

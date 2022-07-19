@@ -1,7 +1,6 @@
-package rest
+package member
 
 import (
-	"github.com/JohannesF99/bkc-fundus-management/internal/member-service/service"
 	"github.com/JohannesF99/bkc-fundus-management/pkg/models"
 	"github.com/gin-gonic/gin"
 	"net/http"
@@ -17,14 +16,14 @@ func StartMemberService() {
 		v1.POST("/", createNewMember)
 		v1.PUT("/:id", updateBorrowCount)
 	}
-	err := r.Run()
+	err := r.Run("localhost:8082")
 	if err != nil {
 		panic(err)
 	}
 }
 
 func getAllMember(c *gin.Context) {
-	members, err := service.GetAllMember()
+	members, err := getAllMembers()
 	if err != nil {
 		panic(err)
 	}
@@ -36,7 +35,7 @@ func getMemberWithId(c *gin.Context) {
 	if err != nil {
 		panic(err)
 	}
-	member, err := service.GetMemberWithId(userId)
+	member, err := getMemberWithUserId(userId)
 	if err != nil {
 		panic(err)
 	}
@@ -44,16 +43,16 @@ func getMemberWithId(c *gin.Context) {
 }
 
 func createNewMember(c *gin.Context) {
-	var apiMember models.ApiMember
-	err := c.BindJSON(&apiMember)
+	var newAccountInfos models.NewMemberInfos
+	err := c.BindJSON(&newAccountInfos)
 	if err != nil {
 		panic(err)
 	}
-	id, err := service.InsertNewMember(*apiMember.ToNormalMember())
+	id, err := insertNewMember(newAccountInfos)
 	if err != nil {
 		panic(err)
 	}
-	member, err := service.GetMemberWithId(int(id))
+	member, err := getMemberWithUserId(int(id))
 	if err != nil {
 		panic(err)
 	}
@@ -73,11 +72,11 @@ func updateBorrowCount(c *gin.Context) {
 	if err != nil {
 		panic(err)
 	}
-	userId, err = service.UpdateBorrowCount(userId, borrowed-returned)
+	userId, err = updateMemberBorrowCount(userId, borrowed-returned)
 	if err != nil {
 		panic(err)
 	}
-	member, err := service.GetMemberWithId(userId)
+	member, err := getMemberWithUserId(userId)
 	if err != nil {
 		panic(err)
 	}

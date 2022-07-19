@@ -1,12 +1,11 @@
-package service
+package member
 
 import (
-	"github.com/JohannesF99/bkc-fundus-management/internal/member-service/database"
 	"github.com/JohannesF99/bkc-fundus-management/pkg/models"
 )
 
-func GetAllMember() ([]models.Member, error) {
-	db, err := database.Connect()
+func getAllMembers() ([]models.Member, error) {
+	db, err := Connect()
 	if err != nil {
 		return nil, err
 	}
@@ -17,8 +16,8 @@ func GetAllMember() ([]models.Member, error) {
 	return members, nil
 }
 
-func GetMemberWithId(userId int) (models.Member, error) {
-	db, err := database.Connect()
+func getMemberWithUserId(userId int) (models.Member, error) {
+	db, err := Connect()
 	if err != nil {
 		return models.Member{}, err
 	}
@@ -29,8 +28,8 @@ func GetMemberWithId(userId int) (models.Member, error) {
 	return member, nil
 }
 
-func InsertNewMember(newMember models.Member) (int64, error) {
-	db, err := database.Connect()
+func insertNewMember(newMember models.NewMemberInfos) (int64, error) {
+	db, err := Connect()
 	if err != nil {
 		return -1, err
 	}
@@ -44,8 +43,8 @@ func InsertNewMember(newMember models.Member) (int64, error) {
 	return id, nil
 }
 
-func UpdateBorrowCount(userId int, diff int) (int, error) {
-	db, _ := database.Connect()
+func updateMemberBorrowCount(userId int, diff int) (int, error) {
+	db, _ := Connect()
 	count, err := db.UpdateBorrowedItemCount(userId, diff)
 	if err != nil {
 		return -1, err
