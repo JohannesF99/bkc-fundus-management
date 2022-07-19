@@ -1,0 +1,389 @@
+{
+	"info": {
+		"_postman_id": "feac1ce4-ebb7-45ac-8e3e-d77a97ac2798",
+		"name": "BKC Fundus Management",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "Member Service",
+			"item": [
+				{
+					"name": "Get All Member",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{URL}}:8082/v1/member",
+							"host": [
+								"{{URL}}"
+							],
+							"port": "8082",
+							"path": [
+								"v1",
+								"member"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get Member From ID",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{URL}}:8082/v1/member/{{MEMBER_ID}}",
+							"host": [
+								"{{URL}}"
+							],
+							"port": "8082",
+							"path": [
+								"v1",
+								"member",
+								"{{MEMBER_ID}}"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Create New Member",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"name\": \"Test\",\n    \"comment\": \"Test over Rest-API\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{URL}}:8082/v1/member",
+							"host": [
+								"{{URL}}"
+							],
+							"port": "8082",
+							"path": [
+								"v1",
+								"member"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "New Request",
+					"request": {
+						"method": "PUT",
+						"header": [],
+						"url": {
+							"raw": "{{URL}}:8082/v1/member/{{MEMBER_ID}}?borrowed=4&returned=2",
+							"host": [
+								"{{URL}}"
+							],
+							"port": "8082",
+							"path": [
+								"v1",
+								"member",
+								"{{MEMBER_ID}}"
+							],
+							"query": [
+								{
+									"key": "borrowed",
+									"value": "4"
+								},
+								{
+									"key": "returned",
+									"value": "2"
+								}
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Item Service",
+			"item": [
+				{
+					"name": "Get All Items",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{URL}}:8081/v1/item",
+							"host": [
+								"{{URL}}"
+							],
+							"port": "8081",
+							"path": [
+								"v1",
+								"item"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get Single Item",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{URL}}:8081/v1/item/{{MEMBER_ID}}",
+							"host": [
+								"{{URL}}"
+							],
+							"port": "8081",
+							"path": [
+								"v1",
+								"item",
+								"{{MEMBER_ID}}"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Add New Item",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"Name\": \"Rock\",\n    \"Capacity\": 15,\n    \"Description\": \"Langer, Pinker Rock für z.B.:  Barbie\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{URL}}:8081/v1/item",
+							"host": [
+								"{{URL}}"
+							],
+							"port": "8081",
+							"path": [
+								"v1",
+								"item"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Change Availability",
+					"request": {
+						"method": "PUT",
+						"header": [],
+						"url": {
+							"raw": "{{URL}}:8081/v1/item/{{MEMBER_ID}}?borrowed=5&returned=2",
+							"host": [
+								"{{URL}}"
+							],
+							"port": "8081",
+							"path": [
+								"v1",
+								"item",
+								"{{MEMBER_ID}}"
+							],
+							"query": [
+								{
+									"key": "borrowed",
+									"value": "5"
+								},
+								{
+									"key": "returned",
+									"value": "2"
+								}
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Entry Service",
+			"item": [
+				{
+					"name": "Get All Entries",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{URL}}:8080/v1/entry",
+							"host": [
+								"{{URL}}"
+							],
+							"port": "8080",
+							"path": [
+								"v1",
+								"entry"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get All Entries For A Member",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{URL}}:8080/v1/entry/member/{{MEMBER_ID}}",
+							"host": [
+								"{{URL}}"
+							],
+							"port": "8080",
+							"path": [
+								"v1",
+								"entry",
+								"member",
+								"{{MEMBER_ID}}"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get All Entries For A Item",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{URL}}:8080/v1/entry/item/{{MEMBER_ID}}",
+							"host": [
+								"{{URL}}"
+							],
+							"port": "8080",
+							"path": [
+								"v1",
+								"entry",
+								"item",
+								"{{MEMBER_ID}}"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Create New Entry",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"MemberId\": 1,\n    \"ItemId\": 1,\n    \"Capacity\": 5\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{URL}}:8080/v1/entry",
+							"host": [
+								"{{URL}}"
+							],
+							"port": "8080",
+							"path": [
+								"v1",
+								"entry"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Update Entry",
+					"request": {
+						"method": "PUT",
+						"header": [],
+						"url": {
+							"raw": "{{URL}}:8080/v1/entry/{{MEMBER_ID}}?borrowed=5&returned=2",
+							"host": [
+								"{{URL}}"
+							],
+							"port": "8080",
+							"path": [
+								"v1",
+								"entry",
+								"{{MEMBER_ID}}"
+							],
+							"query": [
+								{
+									"key": "borrowed",
+									"value": "5"
+								},
+								{
+									"key": "returned",
+									"value": "2"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "New Request",
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "{{URL}}:8080/v1/entry/{{MEMBER_ID}}",
+							"host": [
+								"{{URL}}"
+							],
+							"port": "8080",
+							"path": [
+								"v1",
+								"entry",
+								"{{MEMBER_ID}}"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		}
+	],
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		},
+		{
+			"listen": "test",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		}
+	],
+	"variable": [
+		{
+			"key": "URL",
+			"value": "localhost",
+			"type": "default"
+		},
+		{
+			"key": "MEMBER_ID",
+			"value": "1",
+			"type": "default"
+		}
+	]
+}
