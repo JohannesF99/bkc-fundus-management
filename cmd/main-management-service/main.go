@@ -30,9 +30,9 @@ func main() {
 		authorized.POST("entry", borrowItem)                           //Check
 		authorized.PUT("entry/:entryId", changeEntryCapacity)
 		authorized.PUT("entry/:entryId/lost/:diff", borrowedItemLost)
-		authorized.PUT("member/:memberId/status/:status", activateOrDeactivateMember)
-		authorized.DELETE("entry/:entryId", removeEntry)
-		authorized.DELETE("item/:itemId", removeItem)
+		authorized.PUT("member/:memberId/status/:status", activateOrDeactivateMember) //Error
+		authorized.DELETE("entry/:entryId", removeEntry)                              //Error
+		authorized.DELETE("item/:itemId", removeItem)                                 //Error
 	}
 	err := r.Run(":8083")
 	if err != nil {
@@ -392,22 +392,6 @@ func changeEntryCapacity(c *gin.Context) {
 	c.JSON(http.StatusOK, entry)
 }
 
-func removeEntry(c *gin.Context) {
-	entryId, err := strconv.Atoi(c.Param("entryId"))
-	if err != nil {
-		panic(err)
-	}
-	_, err = doesEntryExistForEntryId(entryId)
-	if err != nil {
-		panic(err)
-	}
-	entry, err := removeExistingEntry(entryId)
-	if err != nil {
-		panic(err)
-	}
-	c.JSON(http.StatusOK, entry)
-}
-
 func borrowedItemLost(c *gin.Context) {
 	entryId, err := strconv.Atoi(c.Param("entryId"))
 	if err != nil {
@@ -449,20 +433,40 @@ func borrowedItemLost(c *gin.Context) {
 func activateOrDeactivateMember(c *gin.Context) {
 	memberId, err := strconv.Atoi(c.Param("memberId"))
 	if err != nil {
-		panic(err)
+		c.JSON(http.StatusBadRequest, models.Error{
+			Details: err.Error(),
+			Path:    c.FullPath(),
+			Object:  nil,
+			Time:    time.Now(),
+		})
+		return
 	}
 	status, err := strconv.ParseBool(c.Param("status"))
 	if err != nil {
-		panic(err)
+		c.JSON(http.StatusBadRequest, models.Error{
+			Details: err.Error(),
+			Path:    c.FullPath(),
+			Object:  nil,
+			Time:    time.Now(),
+		})
+		return
 	}
 	member, err := doesMemberExist(memberId)
 	if err != nil {
-		panic(err)
+		c.JSON(http.StatusBadRequest, models.Error{
+			Details: err.Error(),
+			Path:    c.FullPath(),
+			Object:  nil,
+			Time:    time.Now(),
+		})
+		return
 	}
 	if member.BorrowedItemCount > 0 {
-		c.JSON(http.StatusConflict, gin.H{
-			"message": "The Member has to return all borrowed Items before his Status can be changed",
-			"member":  member,
+		c.JSON(http.StatusBadRequest, models.Error{
+			Details: "The Member has to return all borrowed Items before a Status change",
+			Path:    c.FullPath(),
+			Object:  member,
+			Time:    time.Now(),
 		})
 		return
 	}
@@ -473,19 +477,67 @@ func activateOrDeactivateMember(c *gin.Context) {
 	c.JSON(http.StatusOK, member)
 }
 
+func removeEntry(c *gin.Context) {
+	entryId, err := strconv.Atoi(c.Param("entryId"))
+	if err != nil {
+		c.JSON(http.StatusBadRequest, models.Error{
+			Details: err.Error(),
+			Path:    c.FullPath(),
+			Object:  nil,
+			Time:    time.Now(),
+		})
+		return
+	}
+	_, err = doesEntryExistForEntryId(entryId)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, models.Error{
+			Details: err.Error(),
+			Path:    c.FullPath(),
+			Object:  nil,
+			Time:    time.Now(),
+		})
+		return
+	}
+	entry, err := removeExistingEntry(entryId)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, models.Error{
+			Details: err.Error(),
+			Path:    c.FullPath(),
+			Object:  nil,
+			Time:    time.Now(),
+		})
+		return
+	}
+	c.JSON(http.StatusOK, entry)
+}
+
 func removeItem(c *gin.Context) {
 	itemId, err := strconv.Atoi(c.Param("itemId"))
 	if err != nil {
-		panic(err)
+		c.JSON(http.StatusBadRequest, models.Error{
+			Details: err.Error(),
+			Path:    c.FullPath(),
+			Object:  nil,
+			Time:    time.Now(),
+		})
+		return
 	}
 	item, err := doesItemExist(itemId)
 	if err != nil {
-		panic(err)
+		c.JSON(http.StatusBadRequest, models.Error{
+			Details: err.Error(),
+			Path:    c.FullPath(),
+			Object:  nil,
+			Time:    time.Now(),
+		})
+		return
 	}
 	if item.Availability != item.Capacity {
-		c.JSON(http.StatusConflict, gin.H{
-			"message": "All borrowed Items have to be returned before the Item can be deleted!",
-			"item":    item,
+		c.JSON(http.StatusBadRequest, models.Error{
+			Details: "Not every Piece has been returned",
+			Path:    c.FullPath(),
+			Object:  item,
+			Time:    time.Now(),
 		})
 		return
 	}
