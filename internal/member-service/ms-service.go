@@ -65,7 +65,7 @@ func changeMemberStatus(memberId int, status bool) (models.Member, error) {
 	if member.BorrowedItemCount > 0 {
 		return models.Member{}, models.Error{
 			Details: "User-Status cannot be changed until every borrowed Item has been returned",
-			Path:    "/v1/member/:id/status/:status",
+			Path:    "Member Service - changeMemberStatus",
 			Object:  member.String(),
 			Time:    time.Now(),
 		}

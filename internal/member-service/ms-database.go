@@ -4,6 +4,7 @@ import (
 	"database/sql"
 	"github.com/JohannesF99/bkc-fundus-management/pkg/models"
 	_ "github.com/go-sql-driver/mysql"
+	"time"
 )
 
 type DB struct {
@@ -13,7 +14,12 @@ type DB struct {
 func connect() (DB, error) {
 	db, err := sql.Open("mysql", "root:2678@/bkc?parseTime=true")
 	if err != nil {
-		return DB{}, err
+		return DB{}, models.Error{
+			Details: err.Error(),
+			Path:    "Member Service - Database Connection",
+			Object:  "",
+			Time:    time.Now(),
+		}
 	}
 	return DB{db}, nil
 }
@@ -23,12 +29,22 @@ func (db DB) GetAllMembers() ([]models.Member, error) {
 	tx, err := db.db.Begin()
 	defer tx.Commit()
 	if err != nil {
-		return nil, err
+		return nil, models.Error{
+			Details: err.Error(),
+			Path:    "Member Service - GetAllMembers()",
+			Object:  "",
+			Time:    time.Now(),
+		}
 	}
 	rows, err := tx.Query("SELECT * FROM bkc.members")
 	defer rows.Close()
 	if err != nil {
-		return nil, err
+		return nil, models.Error{
+			Details: err.Error(),
+			Path:    "Member Service - GetAllMembers()",
+			Object:  "",
+			Time:    time.Now(),
+		}
 	}
 	for rows.Next() {
 		var newMember models.Member
@@ -41,7 +57,12 @@ func (db DB) GetAllMembers() ([]models.Member, error) {
 			&newMember.Created,
 			&newMember.Modified)
 		if err != nil {
-			return nil, err
+			return nil, models.Error{
+				Details: err.Error(),
+				Path:    "Member Service - GetAllMembers()",
+				Object:  "",
+				Time:    time.Now(),
+			}
 		}
 		members = append(members, newMember)
 	}
@@ -52,12 +73,22 @@ func (db DB) GetMemberWithId(userId int) (models.Member, error) {
 	tx, err := db.db.Begin()
 	defer tx.Commit()
 	if err != nil {
-		return models.Member{}, err
+		return models.Member{}, models.Error{
+			Details: err.Error(),
+			Path:    "Member Service - GetMemberWithId()",
+			Object:  "",
+			Time:    time.Now(),
+		}
 	}
 	rows, err := tx.Query("SELECT * FROM bkc.members WHERE id=?", userId)
 	defer rows.Close()
 	if err != nil {
-		return models.Member{}, err
+		return models.Member{}, models.Error{
+			Details: err.Error(),
+			Path:    "Member Service - GetMemberWithId()",
+			Object:  "",
+			Time:    time.Now(),
+		}
 	}
 	var member models.Member
 	rows.Next()
@@ -70,7 +101,12 @@ func (db DB) GetMemberWithId(userId int) (models.Member, error) {
 		&member.Created,
 		&member.Modified)
 	if err != nil {
-		return models.Member{}, err
+		return models.Member{}, models.Error{
+			Details: err.Error(),
+			Path:    "Member Service - GetMemberWithId()",
+			Object:  "",
+			Time:    time.Now(),
+		}
 	}
 	return member, nil
 }
@@ -80,19 +116,34 @@ func (db DB) CreateMember(member models.Member) (int64, error) {
 	defer tx.Commit()
 	if err != nil {
 		_ = tx.Rollback()
-		return -1, err
+		return -1, models.Error{
+			Details: err.Error(),
+			Path:    "Member Service - CreateMember()",
+			Object:  "",
+			Time:    time.Now(),
+		}
 	}
 	res, err := tx.Exec(
 		"INSERT INTO bkc.members(name, comment) VALUES (?,?)",
 		member.Name, member.Comment)
 	if err != nil {
 		_ = tx.Rollback()
-		return -1, err
+		return -1, models.Error{
+			Details: err.Error(),
+			Path:    "Member Service - CreateMember()",
+			Object:  "",
+			Time:    time.Now(),
+		}
 	}
 	id, err := res.LastInsertId()
 	if err != nil {
 		_ = tx.Rollback()
-		return -1, err
+		return -1, models.Error{
+			Details: err.Error(),
+			Path:    "Member Service - CreateMember()",
+			Object:  "",
+			Time:    time.Now(),
+		}
 	}
 	return id, nil
 }
@@ -102,14 +153,24 @@ func (db DB) UpdateBorrowedItemCount(userId int, diff int) (int, error) {
 	defer tx.Commit()
 	if err != nil {
 		_ = tx.Rollback()
-		return -1, err
+		return -1, models.Error{
+			Details: err.Error(),
+			Path:    "Member Service - UpdateBorrowedItemCount()",
+			Object:  "",
+			Time:    time.Now(),
+		}
 	}
 	_, err = tx.Exec(
 		"UPDATE bkc.members SET borrowed_item_count=borrowed_item_count+? WHERE id=?",
 		diff, userId)
 	if err != nil {
 		_ = tx.Rollback()
-		return -1, err
+		return -1, models.Error{
+			Details: err.Error(),
+			Path:    "Member Service - UpdateBorrowedItemCount()",
+			Object:  "",
+			Time:    time.Now(),
+		}
 	}
 	return userId, nil
 }
@@ -119,17 +180,32 @@ func (db DB) ChangeMemberStatus(userId int, status bool) error {
 	defer tx.Commit()
 	if err != nil {
 		_ = tx.Rollback()
-		return err
+		return models.Error{
+			Details: err.Error(),
+			Path:    "Member Service - ChangeMemberStatus()",
+			Object:  "",
+			Time:    time.Now(),
+		}
 	}
 	res, err := tx.Exec("UPDATE bkc.members SET active=? WHERE id=?", status, userId)
 	if err != nil {
 		_ = tx.Rollback()
-		return err
+		return models.Error{
+			Details: err.Error(),
+			Path:    "Member Service - ChangeMemberStatus()",
+			Object:  "",
+			Time:    time.Now(),
+		}
 	}
 	rowsAffected, err := res.RowsAffected()
 	if err != nil || rowsAffected != 1 {
 		_ = tx.Rollback()
-		return err
+		return models.Error{
+			Details: err.Error(),
+			Path:    "Member Service - ChangeMemberStatus()",
+			Object:  "",
+			Time:    time.Now(),
+		}
 	}
 	return nil
 }

@@ -27,7 +27,8 @@ func StartMemberService() {
 func getAllMember(c *gin.Context) {
 	members, err := getAllMembers()
 	if err != nil {
-		panic(err)
+		c.JSON(http.StatusBadRequest, err)
+		return
 	}
 	c.JSON(http.StatusOK, members)
 }
@@ -35,11 +36,18 @@ func getAllMember(c *gin.Context) {
 func getMemberWithId(c *gin.Context) {
 	userId, err := strconv.Atoi(c.Param("id"))
 	if err != nil {
-		panic(err)
+		c.JSON(http.StatusBadRequest, models.Error{
+			Details: err.Error(),
+			Path:    "Member Service - getMemberWithId()",
+			Object:  "",
+			Time:    time.Now(),
+		})
+		return
 	}
 	member, err := getMemberWithUserId(userId)
 	if err != nil {
-		panic(err)
+		c.JSON(http.StatusBadRequest, err)
+		return
 	}
 	c.JSON(http.StatusOK, member)
 }
@@ -48,15 +56,23 @@ func createNewMember(c *gin.Context) {
 	var newAccountInfos models.NewMemberInfos
 	err := c.BindJSON(&newAccountInfos)
 	if err != nil {
-		panic(err)
+		c.JSON(http.StatusBadRequest, models.Error{
+			Details: err.Error(),
+			Path:    "Member Service - createNewMember()",
+			Object:  "",
+			Time:    time.Now(),
+		})
+		return
 	}
 	id, err := insertNewMember(newAccountInfos)
 	if err != nil {
-		panic(err)
+		c.JSON(http.StatusBadRequest, err)
+		return
 	}
 	member, err := getMemberWithUserId(int(id))
 	if err != nil {
-		panic(err)
+		c.JSON(http.StatusBadRequest, err)
+		return
 	}
 	c.JSON(http.StatusOK, member)
 }
@@ -64,23 +80,43 @@ func createNewMember(c *gin.Context) {
 func updateBorrowCount(c *gin.Context) {
 	userId, err := strconv.Atoi(c.Param("id"))
 	if err != nil {
-		panic(err)
+		c.JSON(http.StatusBadRequest, models.Error{
+			Details: err.Error(),
+			Path:    "Member Service - updateBorrowCount()",
+			Object:  "",
+			Time:    time.Now(),
+		})
+		return
 	}
 	borrowed, err := strconv.Atoi(c.DefaultQuery("borrowed", "0"))
 	if err != nil {
-		panic(err)
+		c.JSON(http.StatusBadRequest, models.Error{
+			Details: err.Error(),
+			Path:    "Member Service - updateBorrowCount()",
+			Object:  "",
+			Time:    time.Now(),
+		})
+		return
 	}
 	returned, err := strconv.Atoi(c.DefaultQuery("returned", "0"))
 	if err != nil {
-		panic(err)
+		c.JSON(http.StatusBadRequest, models.Error{
+			Details: err.Error(),
+			Path:    "Member Service - updateBorrowCount()",
+			Object:  "",
+			Time:    time.Now(),
+		})
+		return
 	}
 	userId, err = updateMemberBorrowCount(userId, borrowed-returned)
 	if err != nil {
-		panic(err)
+		c.JSON(http.StatusBadRequest, err)
+		return
 	}
 	member, err := getMemberWithUserId(userId)
 	if err != nil {
-		panic(err)
+		c.JSON(http.StatusBadRequest, err)
+		return
 	}
 	c.JSON(http.StatusOK, member)
 }
@@ -90,8 +126,8 @@ func changeStatus(c *gin.Context) {
 	if err != nil {
 		c.JSON(http.StatusBadRequest, models.Error{
 			Details: err.Error(),
-			Path:    c.FullPath(),
-			Object:  c.Param("id"),
+			Path:    "Member Service - changeStatus()",
+			Object:  "",
 			Time:    time.Now(),
 		})
 		return
@@ -100,8 +136,8 @@ func changeStatus(c *gin.Context) {
 	if err != nil {
 		c.JSON(http.StatusBadRequest, models.Error{
 			Details: err.Error(),
-			Path:    c.FullPath(),
-			Object:  c.Param("status"),
+			Path:    "Member Service - changeStatus()",
+			Object:  "",
 			Time:    time.Now(),
 		})
 		return
