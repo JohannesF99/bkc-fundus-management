@@ -4,6 +4,7 @@ import (
 	"database/sql"
 	"github.com/JohannesF99/bkc-fundus-management/pkg/models"
 	_ "github.com/go-sql-driver/mysql"
+	"strconv"
 	"time"
 )
 
@@ -160,13 +161,32 @@ func (db DB) UpdateBorrowedItemCount(userId int, diff int) (int, error) {
 			Time:    time.Now(),
 		}
 	}
-	_, err = tx.Exec(
+	res, err := tx.Exec(
 		"UPDATE bkc.members SET borrowed_item_count=borrowed_item_count+? WHERE id=?",
 		diff, userId)
 	if err != nil {
 		_ = tx.Rollback()
 		return -1, models.Error{
 			Details: err.Error(),
+			Path:    "Member Service - UpdateBorrowedItemCount()",
+			Object:  "",
+			Time:    time.Now(),
+		}
+	}
+	rowsAffected, err := res.RowsAffected()
+	if err != nil {
+		_ = tx.Rollback()
+		return -1, models.Error{
+			Details: err.Error(),
+			Path:    "Member Service - UpdateBorrowedItemCount()",
+			Object:  "",
+			Time:    time.Now(),
+		}
+	}
+	if rowsAffected != 1 {
+		_ = tx.Rollback()
+		return -1, models.Error{
+			Details: "Rows Affected: " + strconv.Itoa(int(rowsAffected)),
 			Path:    "Member Service - UpdateBorrowedItemCount()",
 			Object:  "",
 			Time:    time.Now(),
@@ -198,10 +218,19 @@ func (db DB) ChangeMemberStatus(userId int, status bool) error {
 		}
 	}
 	rowsAffected, err := res.RowsAffected()
-	if err != nil || rowsAffected != 1 {
+	if err != nil {
 		_ = tx.Rollback()
 		return models.Error{
 			Details: err.Error(),
+			Path:    "Member Service - ChangeMemberStatus()",
+			Object:  "",
+			Time:    time.Now(),
+		}
+	}
+	if rowsAffected != 1 {
+		_ = tx.Rollback()
+		return models.Error{
+			Details: "Rows Affected: " + strconv.Itoa(int(rowsAffected)),
 			Path:    "Member Service - ChangeMemberStatus()",
 			Object:  "",
 			Time:    time.Now(),
