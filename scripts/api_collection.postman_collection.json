@@ -76,7 +76,7 @@
 					"response": []
 				},
 				{
-					"name": "New Request",
+					"name": "Change Member Borrowed Count",
 					"request": {
 						"method": "PUT",
 						"header": [],
@@ -100,6 +100,28 @@
 									"key": "returned",
 									"value": "2"
 								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Change Member Status",
+					"request": {
+						"method": "PUT",
+						"header": [],
+						"url": {
+							"raw": "{{URL}}:8082/v1/member/{{MEMBER_ID}}/status/false",
+							"host": [
+								"{{URL}}"
+							],
+							"port": "8082",
+							"path": [
+								"v1",
+								"member",
+								"{{MEMBER_ID}}",
+								"status",
+								"false"
 							]
 						}
 					},
@@ -206,6 +228,56 @@
 						}
 					},
 					"response": []
+				},
+				{
+					"name": "Item Lost",
+					"request": {
+						"method": "PUT",
+						"header": [],
+						"url": {
+							"raw": "{{URL}}:8081/v1/item/{{MEMBER_ID}}?borrowed=5&returned=2",
+							"host": [
+								"{{URL}}"
+							],
+							"port": "8081",
+							"path": [
+								"v1",
+								"item",
+								"{{MEMBER_ID}}"
+							],
+							"query": [
+								{
+									"key": "borrowed",
+									"value": "5"
+								},
+								{
+									"key": "returned",
+									"value": "2"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Delete Item",
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "{{URL}}:8081/v1/item/{{MEMBER_ID}}",
+							"host": [
+								"{{URL}}"
+							],
+							"port": "8081",
+							"path": [
+								"v1",
+								"item",
+								"{{MEMBER_ID}}"
+							]
+						}
+					},
+					"response": []
 				}
 			]
 		},
@@ -226,6 +298,26 @@
 							"path": [
 								"v1",
 								"entry"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get Entry For Entry-ID",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{URL}}:8080/v1/entry/1",
+							"host": [
+								"{{URL}}"
+							],
+							"port": "8080",
+							"path": [
+								"v1",
+								"entry",
+								"1"
 							]
 						}
 					},
@@ -266,6 +358,29 @@
 							"path": [
 								"v1",
 								"entry",
+								"item",
+								"{{MEMBER_ID}}"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get Entry For Member ID and Item ID",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{URL}}:8080/v1/entry/member/{{MEMBER_ID}}/item/{{MEMBER_ID}}",
+							"host": [
+								"{{URL}}"
+							],
+							"port": "8080",
+							"path": [
+								"v1",
+								"entry",
+								"member",
+								"{{MEMBER_ID}}",
 								"item",
 								"{{MEMBER_ID}}"
 							]
@@ -332,7 +447,7 @@
 					"response": []
 				},
 				{
-					"name": "New Request",
+					"name": "Delete Entry",
 					"request": {
 						"method": "DELETE",
 						"header": [],
@@ -350,6 +465,332 @@
 						}
 					},
 					"response": []
+				}
+			]
+		},
+		{
+			"name": "Management Service",
+			"item": [
+				{
+					"name": "Get All Member",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{URL}}:8083/v1/fundus/member",
+							"host": [
+								"{{URL}}"
+							],
+							"port": "8083",
+							"path": [
+								"v1",
+								"fundus",
+								"member"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get All Items",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{URL}}:8083/v1/fundus/item",
+							"host": [
+								"{{URL}}"
+							],
+							"port": "8083",
+							"path": [
+								"v1",
+								"fundus",
+								"item"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get All Items For Member",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{URL}}:8083/v1/fundus/member/1/items",
+							"host": [
+								"{{URL}}"
+							],
+							"port": "8083",
+							"path": [
+								"v1",
+								"fundus",
+								"member",
+								"1",
+								"items"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get All Member For Item",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{URL}}:8083/v1/fundus/item/1/members",
+							"host": [
+								"{{URL}}"
+							],
+							"port": "8083",
+							"path": [
+								"v1",
+								"fundus",
+								"item",
+								"1",
+								"members"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Register New Member",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"name\": \"Johannes Franke\",\n    \"comment\": \"BKC Flower Power\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{URL}}:8083/v1/fundus/member",
+							"host": [
+								"{{URL}}"
+							],
+							"port": "8083",
+							"path": [
+								"v1",
+								"fundus",
+								"member"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Register New Item",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"Name\": \"Rock\",\n    \"Capacity\": 15,\n    \"Description\": \"Langer, Pinker Rock für z.B.:  Barbie\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{URL}}:8083/v1/fundus/item",
+							"host": [
+								"{{URL}}"
+							],
+							"port": "8083",
+							"path": [
+								"v1",
+								"fundus",
+								"item"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Register New Entry",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"MemberId\": 1,\n    \"ItemId\": 1,\n    \"Capacity\": 5\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{URL}}:8083/v1/fundus/entry",
+							"host": [
+								"{{URL}}"
+							],
+							"port": "8083",
+							"path": [
+								"v1",
+								"fundus",
+								"entry"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Return A Part of Entry",
+					"request": {
+						"method": "PUT",
+						"header": [],
+						"url": {
+							"raw": "{{URL}}:8083/v1/fundus/entry/1?returned=2",
+							"host": [
+								"{{URL}}"
+							],
+							"port": "8083",
+							"path": [
+								"v1",
+								"fundus",
+								"entry",
+								"1"
+							],
+							"query": [
+								{
+									"key": "returned",
+									"value": "2"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Item Lost",
+					"request": {
+						"method": "PUT",
+						"header": [],
+						"url": {
+							"raw": "{{URL}}:8083/v1/fundus/entry/1/lost/2",
+							"host": [
+								"{{URL}}"
+							],
+							"port": "8083",
+							"path": [
+								"v1",
+								"fundus",
+								"entry",
+								"1",
+								"lost",
+								"2"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Activate Or Deactivate Member",
+					"request": {
+						"method": "PUT",
+						"header": [],
+						"url": {
+							"raw": "{{URL}}:8083/v1/fundus/member/1/status/false",
+							"host": [
+								"{{URL}}"
+							],
+							"port": "8083",
+							"path": [
+								"v1",
+								"fundus",
+								"member",
+								"1",
+								"status",
+								"false"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Delete Entry",
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "{{URL}}:8083/v1/fundus/entry/1",
+							"host": [
+								"{{URL}}"
+							],
+							"port": "8083",
+							"path": [
+								"v1",
+								"fundus",
+								"entry",
+								"1"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Delete Item",
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "{{URL}}:8083/v1/fundus/item/1",
+							"host": [
+								"{{URL}}"
+							],
+							"port": "8083",
+							"path": [
+								"v1",
+								"fundus",
+								"item",
+								"1"
+							]
+						}
+					},
+					"response": []
+				}
+			],
+			"auth": {
+				"type": "basic",
+				"basic": [
+					{
+						"key": "password",
+						"value": "1234",
+						"type": "string"
+					},
+					{
+						"key": "username",
+						"value": "sandra",
+						"type": "string"
+					}
+				]
+			},
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"type": "text/javascript",
+						"exec": [
+							""
+						]
+					}
+				},
+				{
+					"listen": "test",
+					"script": {
+						"type": "text/javascript",
+						"exec": [
+							""
+						]
+					}
 				}
 			]
 		}

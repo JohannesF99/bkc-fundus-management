@@ -51,3 +51,19 @@ func updateMemberBorrowCount(userId int, diff int) (int, error) {
 	}
 	return count, nil
 }
+
+func changeMemberStatus(userId int, status bool) (models.Member, error) {
+	db, err := Connect()
+	if err != nil {
+		return models.Member{}, err
+	}
+	err = db.ChangeMemberStatus(userId, status)
+	if err != nil {
+		return models.Member{}, err
+	}
+	member, err := db.GetMemberWithId(userId)
+	if err != nil {
+		return models.Member{}, err
+	}
+	return member, nil
+}

@@ -97,25 +97,25 @@ func (db DB) insertNewItemToDB(item models.Item) (int64, error) {
 	return id, nil
 }
 
-func (db DB) updateItemAvailabilityInDB(itemId int, diff int) (int, error) {
+func (db DB) updateItemAvailabilityInDB(itemId int, diff int) error {
 	tx, err := db.db.Begin()
 	defer tx.Commit()
 	if err != nil {
 		_ = tx.Rollback()
-		return -1, err
+		return err
 	}
 	rows, err := tx.Exec("UPDATE bkc.items SET available=available+? WHERE id=?",
 		diff, itemId)
 	if err != nil {
 		_ = tx.Rollback()
-		return -1, err
+		return err
 	}
 	affected, err := rows.RowsAffected()
 	if err != nil || affected != 1 {
 		_ = tx.Rollback()
-		return 0, err
+		return err
 	}
-	return itemId, nil
+	return nil
 }
 
 func (db DB) deleteItemFromDB(itemId int) error {
@@ -126,6 +126,27 @@ func (db DB) deleteItemFromDB(itemId int) error {
 		return err
 	}
 	rows, err := tx.Exec("DELETE FROM bkc.items WHERE id=?", itemId)
+	if err != nil {
+		_ = tx.Rollback()
+		return err
+	}
+	affected, err := rows.RowsAffected()
+	if err != nil || affected != 1 {
+		_ = tx.Rollback()
+		return err
+	}
+	return nil
+}
+
+func (db DB) updateCapacityInDB(itemId int, diff int) error {
+	tx, err := db.db.Begin()
+	defer tx.Commit()
+	if err != nil {
+		_ = tx.Rollback()
+		return err
+	}
+	rows, err := tx.Exec("UPDATE bkc.items SET capacity=capacity+? WHERE id=?",
+		diff, itemId)
 	if err != nil {
 		_ = tx.Rollback()
 		return err

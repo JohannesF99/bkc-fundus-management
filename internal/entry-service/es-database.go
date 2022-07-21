@@ -18,8 +18,8 @@ func connect() (DB, error) {
 	return DB{db}, nil
 }
 
-func (db DB) getAllEntriesFromDB() ([]models.EntryInfo, error) {
-	var allEntries []models.EntryInfo
+func (db DB) getAllEntriesFromDB() ([]models.Entry, error) {
+	var allEntries []models.Entry
 	tx, err := db.db.Begin()
 	defer tx.Commit()
 	if err != nil {
@@ -31,7 +31,7 @@ func (db DB) getAllEntriesFromDB() ([]models.EntryInfo, error) {
 	}
 	defer rows.Close()
 	for rows.Next() {
-		var newEntry models.EntryInfo
+		var newEntry models.Entry
 		err := rows.Scan(
 			&newEntry.Id,
 			&newEntry.MemberId,
@@ -47,7 +47,7 @@ func (db DB) getAllEntriesFromDB() ([]models.EntryInfo, error) {
 	return allEntries, nil
 }
 
-func (db DB) addEntryToDB(newEntry models.NewEntry) (int64, error) {
+func (db DB) addEntryToDB(newEntry models.NewEntryInfos) (int64, error) {
 	tx, err := db.db.Begin()
 	defer tx.Commit()
 	if err != nil {
@@ -113,8 +113,8 @@ func (db DB) deleteEntryFromDB(entryId int) error {
 	return nil
 }
 
-func (db DB) getEntriesForMemberIdFromDB(memberId int) ([]models.EntryInfo, error) {
-	var allEntries []models.EntryInfo
+func (db DB) getEntriesForMemberIdFromDB(memberId int) ([]models.Entry, error) {
+	var allEntries []models.Entry
 	tx, err := db.db.Begin()
 	defer tx.Commit()
 	if err != nil {
@@ -126,7 +126,7 @@ func (db DB) getEntriesForMemberIdFromDB(memberId int) ([]models.EntryInfo, erro
 	}
 	defer rows.Close()
 	for rows.Next() {
-		var newEntry models.EntryInfo
+		var newEntry models.Entry
 		err := rows.Scan(
 			&newEntry.Id,
 			&newEntry.MemberId,
@@ -142,8 +142,8 @@ func (db DB) getEntriesForMemberIdFromDB(memberId int) ([]models.EntryInfo, erro
 	return allEntries, nil
 }
 
-func (db DB) getEntriesForItemIdFromDB(itemId int) ([]models.EntryInfo, error) {
-	var allEntries []models.EntryInfo
+func (db DB) getEntriesForItemIdFromDB(itemId int) ([]models.Entry, error) {
+	var allEntries []models.Entry
 	tx, err := db.db.Begin()
 	defer tx.Commit()
 	if err != nil {
@@ -155,7 +155,7 @@ func (db DB) getEntriesForItemIdFromDB(itemId int) ([]models.EntryInfo, error) {
 	}
 	defer rows.Close()
 	for rows.Next() {
-		var newEntry models.EntryInfo
+		var newEntry models.Entry
 		err := rows.Scan(
 			&newEntry.Id,
 			&newEntry.MemberId,
@@ -171,19 +171,19 @@ func (db DB) getEntriesForItemIdFromDB(itemId int) ([]models.EntryInfo, error) {
 	return allEntries, nil
 }
 
-func (db DB) getEntriesForEntryIdFromDB(entryId int) (models.EntryInfo, error) {
+func (db DB) getEntriesForEntryIdFromDB(entryId int) (models.Entry, error) {
 	tx, err := db.db.Begin()
 	defer tx.Commit()
 	if err != nil {
-		return models.EntryInfo{}, err
+		return models.Entry{}, err
 	}
 	rows, err := tx.Query("SELECT * FROM bkc.entries WHERE id=?", entryId)
 	if err != nil {
-		return models.EntryInfo{}, err
+		return models.Entry{}, err
 	}
 	defer rows.Close()
 	rows.Next()
-	var newEntry models.EntryInfo
+	var newEntry models.Entry
 	err = rows.Scan(
 		&newEntry.Id,
 		&newEntry.MemberId,
@@ -192,7 +192,33 @@ func (db DB) getEntriesForEntryIdFromDB(entryId int) (models.EntryInfo, error) {
 		&newEntry.Created,
 		&newEntry.Modified)
 	if err != nil {
-		return models.EntryInfo{}, err
+		return models.Entry{}, err
+	}
+	return newEntry, nil
+}
+
+func (db DB) getEntryForMemberIdAndItemIdFromDB(memberId int, itemId int) (models.Entry, error) {
+	tx, err := db.db.Begin()
+	defer tx.Commit()
+	if err != nil {
+		return models.Entry{}, err
+	}
+	rows, err := tx.Query("SELECT * FROM bkc.entries WHERE member_id=? AND item_id=?", memberId, itemId)
+	if err != nil {
+		return models.Entry{}, err
+	}
+	defer rows.Close()
+	rows.Next()
+	var newEntry models.Entry
+	err = rows.Scan(
+		&newEntry.Id,
+		&newEntry.MemberId,
+		&newEntry.ItemId,
+		&newEntry.Capacity,
+		&newEntry.Created,
+		&newEntry.Modified)
+	if err != nil {
+		return models.Entry{}, err
 	}
 	return newEntry, nil
 }

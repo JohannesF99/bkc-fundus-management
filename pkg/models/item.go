@@ -1,7 +1,7 @@
 package models
 
 import (
-	"fmt"
+	"strconv"
 	"time"
 )
 
@@ -21,13 +21,14 @@ type NewItemInfos struct {
 	Description string
 }
 
-func (i Item) Print() {
-	fmt.Printf("Item{%s: %d, %s: %s, %s: %d, %s: %d, %s: %s, %s: %s, %s: %s}\n",
-		"ID", i.Id,
-		"Name", i.Name,
-		"Capacity", i.Capacity,
-		"Available", i.Availability,
-		"Description", i.Description,
-		"Created", i.Created.String(),
-		"Modified", i.Modified.String())
+func (i Item) String() string {
+	return "Item{" +
+		"ID" + strconv.Itoa(i.Id) +
+		"Name" + i.Name +
+		"Capacity" + strconv.Itoa(i.Capacity) +
+		"Available" + strconv.Itoa(i.Availability) +
+		"Description" + i.Description +
+		"Created" + i.Created.String() +
+		"Modified" + i.Modified.String() +
+		"}"
 }

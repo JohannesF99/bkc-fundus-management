@@ -12,8 +12,10 @@ func StartEntryService() {
 	v1 := r.Group("/v1/entry")
 	{
 		v1.GET("", allEntries)
+		v1.GET("/:entryId", singleEntry)
 		v1.GET("/member/:memberId", allEntriesForMemberId)
 		v1.GET("/item/:itemId", allEntriesForItemId)
+		v1.GET("/member/:memberId/item/:itemId", entryForMemberIdAndItemId)
 		v1.POST("", newEntry)
 		v1.PUT("/:entryId", changeEntry)
 		v1.DELETE("/:entryId", removeEntry)
@@ -30,6 +32,18 @@ func allEntries(c *gin.Context) {
 		panic(err)
 	}
 	c.JSON(http.StatusOK, entries)
+}
+
+func singleEntry(c *gin.Context) {
+	entryId, err := strconv.Atoi(c.Param("entryId"))
+	if err != nil {
+		panic(err)
+	}
+	entry, err := getEntryForEntryId(entryId)
+	if err != nil {
+		panic(err)
+	}
+	c.JSON(http.StatusOK, entry)
 }
 
 func allEntriesForMemberId(c *gin.Context) {
@@ -57,7 +71,7 @@ func allEntriesForItemId(c *gin.Context) {
 }
 
 func newEntry(c *gin.Context) {
-	var newEntry models.NewEntry
+	var newEntry models.NewEntryInfos
 	err := c.BindJSON(&newEntry)
 	if err != nil {
 		panic(err)
@@ -96,6 +110,27 @@ func removeEntry(c *gin.Context) {
 	}
 	entry, err := deleteEntry(entryId)
 	if err != nil {
+		return
+	}
+	c.JSON(http.StatusOK, entry)
+}
+
+func entryForMemberIdAndItemId(c *gin.Context) {
+	memberId, err := strconv.Atoi(c.Param("memberId"))
+	if err != nil {
+		panic(err)
+	}
+	itemId, err := strconv.Atoi(c.Param("itemId"))
+	if err != nil {
+		panic(err)
+	}
+	entry, err := getEntryForMemberIdAndItemId(memberId, itemId)
+	if err != nil {
+		c.JSON(http.StatusNotFound, gin.H{
+			"error":    "No matching entry could be found",
+			"memberId": memberId,
+			"itemId":   itemId,
+		})
 		return
 	}
 	c.JSON(http.StatusOK, entry)

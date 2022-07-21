@@ -1,7 +1,7 @@
 package models
 
 import (
-	"fmt"
+	"strconv"
 	"time"
 )
 
@@ -20,13 +20,18 @@ type Member struct {
 	Modified          time.Time
 }
 
-func (m Member) Print() {
-	fmt.Printf("Member{%s: %d, %s: %s, %s: %d, %s: %s, %s: %t, %s: %s, %s: %s}\n",
-		"ID", m.Id,
-		"Name", m.Name,
-		"Borrowed Items", m.BorrowedItemCount,
-		"Comment", m.Comment,
-		"Active", m.Active,
-		"Created", m.Created.String(),
-		"Modified", m.Modified.String())
+type Fundus interface {
+	String() string
+}
+
+func (m Member) String() string {
+	return "Member{" +
+		"ID" + strconv.Itoa(m.Id) +
+		"Name" + m.Name +
+		"Borrowed Items" + strconv.Itoa(m.BorrowedItemCount) +
+		"Comment" + m.Comment +
+		"Active" + strconv.FormatBool(m.Active) +
+		"Created" + m.Created.String() +
+		"Modified" + m.Modified.String() +
+		"}"
 }

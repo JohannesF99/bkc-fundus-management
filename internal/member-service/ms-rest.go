@@ -15,6 +15,7 @@ func StartMemberService() {
 		v1.GET("/:id", getMemberWithId)
 		v1.POST("/", createNewMember)
 		v1.PUT("/:id", updateBorrowCount)
+		v1.PUT("/:id/status/:status", changeStatus)
 	}
 	err := r.Run("localhost:8082")
 	if err != nil {
@@ -77,6 +78,22 @@ func updateBorrowCount(c *gin.Context) {
 		panic(err)
 	}
 	member, err := getMemberWithUserId(userId)
+	if err != nil {
+		panic(err)
+	}
+	c.JSON(http.StatusOK, member)
+}
+
+func changeStatus(c *gin.Context) {
+	userId, err := strconv.Atoi(c.Param("id"))
+	if err != nil {
+		panic(err)
+	}
+	status, err := strconv.ParseBool(c.Param("status"))
+	if err != nil {
+		panic(err)
+	}
+	member, err := changeMemberStatus(userId, status)
 	if err != nil {
 		panic(err)
 	}

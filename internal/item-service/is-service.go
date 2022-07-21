@@ -49,11 +49,11 @@ func updateItemAvailability(itemId int, diff int) (int, error) {
 	if err != nil {
 		return -1, err
 	}
-	id, err := db.updateItemAvailabilityInDB(itemId, diff)
+	err = db.updateItemAvailabilityInDB(itemId, diff)
 	if err != nil {
 		return -1, err
 	}
-	return id, nil
+	return itemId, nil
 }
 
 func deleteItem(itemId int) error {
@@ -66,4 +66,20 @@ func deleteItem(itemId int) error {
 		return err
 	}
 	return nil
+}
+
+func borrowedItemLost(itemId int, diff int) (models.Item, error) {
+	db, err := connect()
+	if err != nil {
+		return models.Item{}, err
+	}
+	err = db.updateCapacityInDB(itemId, -diff)
+	if err != nil {
+		return models.Item{}, err
+	}
+	item, err := db.getItemWithIdFromDB(itemId)
+	if err != nil {
+		return models.Item{}, err
+	}
+	return item, nil
 }
