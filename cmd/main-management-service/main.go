@@ -27,7 +27,7 @@ func main() {
 		authorized.GET("item/:itemId/members", getAllMembersForItem)   //Check
 		authorized.POST("member", registerNewMember)                   //Check
 		authorized.POST("item", registerNewItem)                       //Check
-		authorized.POST("entry", borrowItem)
+		authorized.POST("entry", borrowItem)                           //Check
 		authorized.PUT("entry/:entryId", changeEntryCapacity)
 		authorized.PUT("entry/:entryId/lost/:diff", borrowedItemLost)
 		authorized.PUT("member/:memberId/status/:status", activateOrDeactivateMember)
@@ -41,11 +41,14 @@ func main() {
 }
 
 func readValidAccountsFromFile() gin.Accounts {
-	file, _ := os.Open("scripts/accounts.json")
+	file, err := os.Open("scripts/accounts.json")
+	if err != nil {
+		os.Exit(-1)
+	}
 	defer file.Close()
 	decoder := json.NewDecoder(file)
 	accounts := gin.Accounts{}
-	err := decoder.Decode(&accounts)
+	err = decoder.Decode(&accounts)
 	if err != nil {
 		os.Exit(-1)
 	}
@@ -55,13 +58,25 @@ func readValidAccountsFromFile() gin.Accounts {
 func getAllMember(c *gin.Context) {
 	resp, err := http.Get(MemberService)
 	if err != nil {
-		panic(err)
+		c.JSON(0, models.Error{
+			Details: err.Error(),
+			Path:    c.FullPath(),
+			Object:  nil,
+			Time:    time.Now(),
+		})
+		return
 	}
 	defer resp.Body.Close()
 	var memberList []models.Member
 	err = json.NewDecoder(resp.Body).Decode(&memberList)
 	if err != nil {
-		panic(err)
+		c.JSON(0, models.Error{
+			Details: err.Error(),
+			Path:    c.FullPath(),
+			Object:  nil,
+			Time:    time.Now(),
+		})
+		return
 	}
 	c.JSON(http.StatusOK, memberList)
 }
@@ -69,13 +84,25 @@ func getAllMember(c *gin.Context) {
 func getAllItems(c *gin.Context) {
 	resp, err := http.Get(ItemService)
 	if err != nil {
-		panic(err)
+		c.JSON(0, models.Error{
+			Details: err.Error(),
+			Path:    c.FullPath(),
+			Object:  nil,
+			Time:    time.Now(),
+		})
+		return
 	}
 	defer resp.Body.Close()
 	var itemList []models.Item
 	err = json.NewDecoder(resp.Body).Decode(&itemList)
 	if err != nil {
-		panic(err)
+		c.JSON(0, models.Error{
+			Details: err.Error(),
+			Path:    c.FullPath(),
+			Object:  nil,
+			Time:    time.Now(),
+		})
+		return
 	}
 	c.JSON(http.StatusOK, itemList)
 }
@@ -83,17 +110,35 @@ func getAllItems(c *gin.Context) {
 func getAllItemsForMember(c *gin.Context) {
 	memberId, err := strconv.Atoi(c.Param("memberId"))
 	if err != nil {
-		panic(err)
+		c.JSON(0, models.Error{
+			Details: err.Error(),
+			Path:    c.FullPath(),
+			Object:  nil,
+			Time:    time.Now(),
+		})
+		return
 	}
 	resp, err := http.Get(EntryService + "member/" + strconv.Itoa(memberId))
 	if err != nil {
-		panic(err)
+		c.JSON(0, models.Error{
+			Details: err.Error(),
+			Path:    c.FullPath(),
+			Object:  nil,
+			Time:    time.Now(),
+		})
+		return
 	}
 	defer resp.Body.Close()
 	var itemInfoList []models.Export
 	err = json.NewDecoder(resp.Body).Decode(&itemInfoList)
 	if err != nil {
-		panic(err)
+		c.JSON(0, models.Error{
+			Details: err.Error(),
+			Path:    c.FullPath(),
+			Object:  nil,
+			Time:    time.Now(),
+		})
+		return
 	}
 	c.JSON(http.StatusOK, itemInfoList)
 }
@@ -101,17 +146,35 @@ func getAllItemsForMember(c *gin.Context) {
 func getAllMembersForItem(c *gin.Context) {
 	itemId, err := strconv.Atoi(c.Param("itemId"))
 	if err != nil {
-		panic(err)
+		c.JSON(0, models.Error{
+			Details: err.Error(),
+			Path:    c.FullPath(),
+			Object:  nil,
+			Time:    time.Now(),
+		})
+		return
 	}
 	resp, err := http.Get(EntryService + "item/" + strconv.Itoa(itemId))
 	if err != nil {
-		panic(err)
+		c.JSON(0, models.Error{
+			Details: err.Error(),
+			Path:    c.FullPath(),
+			Object:  nil,
+			Time:    time.Now(),
+		})
+		return
 	}
 	defer resp.Body.Close()
 	var memberInfoList []models.Export
 	err = json.NewDecoder(resp.Body).Decode(&memberInfoList)
 	if err != nil {
-		panic(err)
+		c.JSON(0, models.Error{
+			Details: err.Error(),
+			Path:    c.FullPath(),
+			Object:  nil,
+			Time:    time.Now(),
+		})
+		return
 	}
 	c.JSON(http.StatusOK, memberInfoList)
 }
@@ -120,22 +183,46 @@ func registerNewMember(c *gin.Context) {
 	var newAccountInfos models.NewMemberInfos
 	err := c.BindJSON(&newAccountInfos)
 	if err != nil {
-		panic(err)
+		c.JSON(0, models.Error{
+			Details: err.Error(),
+			Path:    c.FullPath(),
+			Object:  nil,
+			Time:    time.Now(),
+		})
+		return
 	}
 	postBody, err := json.Marshal(newAccountInfos)
 	if err != nil {
-		panic(err)
+		c.JSON(0, models.Error{
+			Details: err.Error(),
+			Path:    c.FullPath(),
+			Object:  nil,
+			Time:    time.Now(),
+		})
+		return
 	}
 	responseBody := bytes.NewBuffer(postBody)
 	resp, err := http.Post(MemberService, "application/json", responseBody)
 	if err != nil {
-		panic(err)
+		c.JSON(0, models.Error{
+			Details: err.Error(),
+			Path:    c.FullPath(),
+			Object:  nil,
+			Time:    time.Now(),
+		})
+		return
 	}
 	defer resp.Body.Close()
 	var jsonObj models.Member
 	err = json.NewDecoder(resp.Body).Decode(&jsonObj)
 	if err != nil {
-		panic(err)
+		c.JSON(0, models.Error{
+			Details: err.Error(),
+			Path:    c.FullPath(),
+			Object:  nil,
+			Time:    time.Now(),
+		})
+		return
 	}
 	c.JSON(http.StatusOK, jsonObj)
 }
@@ -144,22 +231,46 @@ func registerNewItem(c *gin.Context) {
 	var newItemInfos models.NewItemInfos
 	err := c.BindJSON(&newItemInfos)
 	if err != nil {
-		panic(err)
+		c.JSON(0, models.Error{
+			Details: err.Error(),
+			Path:    c.FullPath(),
+			Object:  nil,
+			Time:    time.Now(),
+		})
+		return
 	}
 	postBody, err := json.Marshal(newItemInfos)
 	if err != nil {
-		panic(err)
+		c.JSON(0, models.Error{
+			Details: err.Error(),
+			Path:    c.FullPath(),
+			Object:  nil,
+			Time:    time.Now(),
+		})
+		return
 	}
 	responseBody := bytes.NewBuffer(postBody)
 	resp, err := http.Post(ItemService, "application/json", responseBody)
 	if err != nil {
-		panic(err)
+		c.JSON(0, models.Error{
+			Details: err.Error(),
+			Path:    c.FullPath(),
+			Object:  nil,
+			Time:    time.Now(),
+		})
+		return
 	}
 	defer resp.Body.Close()
 	var jsonObj models.Item
 	err = json.NewDecoder(resp.Body).Decode(&jsonObj)
 	if err != nil {
-		panic(err)
+		c.JSON(0, models.Error{
+			Details: err.Error(),
+			Path:    c.FullPath(),
+			Object:  nil,
+			Time:    time.Now(),
+		})
+		return
 	}
 	c.JSON(http.StatusOK, jsonObj)
 }
@@ -217,45 +328,66 @@ func borrowItem(c *gin.Context) {
 func changeEntryCapacity(c *gin.Context) {
 	returned, err := strconv.Atoi(c.Query("returned"))
 	if err != nil {
-		panic(err)
+		c.JSON(0, models.Error{
+			Details: err.Error(),
+			Path:    c.FullPath(),
+			Object:  nil,
+			Time:    time.Now(),
+		})
+		return
 	}
 	entryId, err := strconv.Atoi(c.Param("entryId"))
 	if err != nil {
-		panic(err)
+		c.JSON(0, models.Error{
+			Details: err.Error(),
+			Path:    c.FullPath(),
+			Object:  nil,
+			Time:    time.Now(),
+		})
+		return
 	}
 	existingEntry, err := doesEntryExistForEntryId(entryId)
 	if err != nil {
-		c.JSON(http.StatusConflict, gin.H{
-			"message": "Entry does not exist.",
-			"entry":   entryId,
+		c.JSON(0, models.Error{
+			Details: err.Error(),
+			Path:    c.FullPath(),
+			Object:  nil,
+			Time:    time.Now(),
 		})
 		return
 	}
 	if existingEntry.Capacity < returned {
-		c.JSON(http.StatusConflict, gin.H{
-			"message":  "You want to return more than your current capacity.",
-			"capacity": existingEntry.Capacity,
-			"return":   returned,
+		c.JSON(0, models.Error{
+			Details: "You tried to return more, than you had initially borrowed",
+			Path:    c.FullPath(),
+			Object:  nil,
+			Time:    time.Now(),
 		})
 		return
 	}
 	if existingEntry.Capacity == returned {
 		entry, err := removeExistingEntry(entryId)
 		if err != nil {
-			c.JSON(http.StatusConflict, gin.H{
-				"message": "Could not Delete Entry",
-				"error":   err,
+			c.JSON(0, models.Error{
+				Details: err.Error(),
+				Path:    c.FullPath(),
+				Object:  nil,
+				Time:    time.Now(),
 			})
+			return
 		}
 		c.JSON(http.StatusOK, entry)
 		return
 	}
 	entry, err := updateEntry(entryId, -returned)
 	if err != nil {
-		c.JSON(http.StatusConflict, gin.H{
-			"message": "Failed to update Entry, see Log for more Details",
-			"error":   err,
+		c.JSON(0, models.Error{
+			Details: err.Error(),
+			Path:    c.FullPath(),
+			Object:  nil,
+			Time:    time.Now(),
 		})
+		return
 	}
 	c.JSON(http.StatusOK, entry)
 }
