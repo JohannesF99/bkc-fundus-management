@@ -171,7 +171,7 @@ func (db DB) getEntriesForItemIdFromDB(itemId int) ([]models.Entry, error) {
 	return allEntries, nil
 }
 
-func (db DB) getEntriesForEntryIdFromDB(entryId int) (models.Entry, error) {
+func (db DB) getEntryForEntryIdFromDB(entryId int) (models.Entry, error) {
 	tx, err := db.db.Begin()
 	defer tx.Commit()
 	if err != nil {

@@ -90,11 +90,7 @@ func removeItem(c *gin.Context) {
 	if err != nil {
 		panic(err)
 	}
-	item, err := getItemWithId(itemId)
-	if err != nil {
-		panic(err)
-	}
-	err = deleteItem(itemId)
+	item, err := deleteItem(itemId)
 	if err != nil {
 		panic(err)
 	}

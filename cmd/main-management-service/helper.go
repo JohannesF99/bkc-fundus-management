@@ -8,25 +8,6 @@ import (
 	"strconv"
 )
 
-func removeItemForItemId(itemId int) (models.Item, error) {
-	client := &http.Client{}
-	req, err := http.NewRequest(http.MethodDelete, ItemService+strconv.Itoa(itemId), nil)
-	if err != nil {
-		return models.Item{}, err
-	}
-	resp, err := client.Do(req)
-	if err != nil {
-		return models.Item{}, err
-	}
-	defer resp.Body.Close()
-	var item models.Item
-	err = json.NewDecoder(resp.Body).Decode(&item)
-	if err != nil {
-		return models.Item{}, err
-	}
-	return item, nil
-}
-
 func changeMemberStatus(memberId int, status bool) (models.Member, error) {
 	client := &http.Client{}
 	req, err := http.NewRequest(http.MethodPut, MemberService+

@@ -31,8 +31,8 @@ func main() {
 		authorized.PUT("entry/:entryId", changeEntryCapacity)
 		authorized.PUT("entry/:entryId/lost/:diff", borrowedItemLost)
 		authorized.PUT("member/:memberId/status/:status", activateOrDeactivateMember) //Error
-		authorized.DELETE("entry/:entryId", removeEntry)                              //Error
-		authorized.DELETE("item/:itemId", removeItem)                                 //Error
+		authorized.DELETE("entry/:entryId", removeEntry)                              //Check
+		authorized.DELETE("item/:itemId", removeItem)                                 //Check
 	}
 	err := r.Run(":8083")
 	if err != nil {
@@ -276,7 +276,6 @@ func registerNewItem(c *gin.Context) {
 }
 
 func borrowItem(c *gin.Context) {
-	//Parse Request Body To Object
 	var newEntryInfos models.NewEntryInfos
 	err := c.BindJSON(&newEntryInfos)
 	if err != nil {
@@ -288,7 +287,6 @@ func borrowItem(c *gin.Context) {
 		})
 		return
 	}
-	//Forward Request To Entry-Service
 	postBody, err := json.Marshal(newEntryInfos)
 	if err != nil {
 		c.JSON(0, models.Error{
@@ -488,31 +486,28 @@ func removeEntry(c *gin.Context) {
 		})
 		return
 	}
-	_, err = doesEntryExistForEntryId(entryId)
+	client := &http.Client{}
+	req, err := http.NewRequest(http.MethodDelete, EntryService+strconv.Itoa(entryId), nil)
 	if err != nil {
-		c.JSON(http.StatusBadRequest, models.Error{
-			Details: err.Error(),
-			Path:    c.FullPath(),
-			Object:  nil,
-			Time:    time.Now(),
-		})
-		return
+		panic(err)
 	}
-	entry, err := removeExistingEntry(entryId)
+	resp, err := client.Do(req)
 	if err != nil {
-		c.JSON(http.StatusBadRequest, models.Error{
-			Details: err.Error(),
-			Path:    c.FullPath(),
-			Object:  nil,
-			Time:    time.Now(),
-		})
-		return
+		panic(err)
+	}
+	defer resp.Body.Close()
+	var entry models.Entry
+	err = json.NewDecoder(resp.Body).Decode(&entry)
+	if err != nil {
+		panic(err)
 	}
 	c.JSON(http.StatusOK, entry)
 }
 
 func removeItem(c *gin.Context) {
 	itemId, err := strconv.Atoi(c.Param("itemId"))
+	client := &http.Client{}
+	req, err := http.NewRequest(http.MethodDelete, ItemService+strconv.Itoa(itemId), nil)
 	if err != nil {
 		c.JSON(http.StatusBadRequest, models.Error{
 			Details: err.Error(),
@@ -522,7 +517,7 @@ func removeItem(c *gin.Context) {
 		})
 		return
 	}
-	item, err := doesItemExist(itemId)
+	resp, err := client.Do(req)
 	if err != nil {
 		c.JSON(http.StatusBadRequest, models.Error{
 			Details: err.Error(),
@@ -532,18 +527,17 @@ func removeItem(c *gin.Context) {
 		})
 		return
 	}
-	if item.Availability != item.Capacity {
+	defer resp.Body.Close()
+	var item models.Item
+	err = json.NewDecoder(resp.Body).Decode(&item)
+	if err != nil {
 		c.JSON(http.StatusBadRequest, models.Error{
-			Details: "Not every Piece has been returned",
+			Details: err.Error(),
 			Path:    c.FullPath(),
-			Object:  item,
+			Object:  nil,
 			Time:    time.Now(),
 		})
 		return
-	}
-	item, err = removeItemForItemId(itemId)
-	if err != nil {
-		panic(err)
 	}
 	c.JSON(http.StatusOK, item)
 }

@@ -110,7 +110,7 @@ func removeEntry(c *gin.Context) {
 	}
 	entry, err := deleteEntry(entryId)
 	if err != nil {
-		return
+		panic(err)
 	}
 	c.JSON(http.StatusOK, entry)
 }

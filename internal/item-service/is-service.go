@@ -2,7 +2,32 @@ package items
 
 import (
 	"github.com/JohannesF99/bkc-fundus-management/pkg/models"
+	"time"
 )
+
+func deleteItem(itemId int) (models.Item, error) {
+	db, err := connect()
+	if err != nil {
+		return models.Item{}, err
+	}
+	item, err := db.getItemWithIdFromDB(itemId)
+	if err != nil {
+		return models.Item{}, err
+	}
+	if item.Availability != item.Capacity {
+		return models.Item{}, models.Error{
+			Details: "You can only delete this Item, when every borrowed piece has been returned.",
+			Path:    "/v1/item/:id",
+			Object:  item,
+			Time:    time.Now(),
+		}
+	}
+	err = db.deleteItemFromDB(itemId)
+	if err != nil {
+		return models.Item{}, err
+	}
+	return item, nil
+}
 
 func getAllItems() ([]models.Item, error) {
 	db, err := connect()
@@ -54,18 +79,6 @@ func updateItemAvailability(itemId int, diff int) (int, error) {
 		return -1, err
 	}
 	return itemId, nil
-}
-
-func deleteItem(itemId int) error {
-	db, err := connect()
-	if err != nil {
-		return err
-	}
-	err = db.deleteItemFromDB(itemId)
-	if err != nil {
-		return err
-	}
-	return nil
 }
 
 func borrowedItemLost(itemId int, diff int) (models.Item, error) {

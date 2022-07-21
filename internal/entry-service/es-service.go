@@ -12,6 +12,31 @@ import (
 const ItemService = constants.ItemService
 const MemberService = constants.MemberService
 
+func deleteEntry(entryId int) (models.Entry, error) {
+	//TODO(Rollback)
+	db, err := connect()
+	if err != nil {
+		return models.Entry{}, err
+	}
+	entry, err := db.getEntryForEntryIdFromDB(entryId)
+	if err != nil {
+		return models.Entry{}, err
+	}
+	err = db.deleteEntryFromDB(entryId)
+	if err != nil {
+		return models.Entry{}, err
+	}
+	_, err = changeItemAvailability(entry.ItemId, -entry.Capacity)
+	if err != nil {
+		return models.Entry{}, err
+	}
+	_, err = changeMemberBorrowCount(entry.MemberId, -entry.Capacity)
+	if err != nil {
+		return models.Entry{}, err
+	}
+	return entry, nil
+}
+
 func createNewEntryOrUpdate(newEntryInfo models.NewEntryInfos) (models.Entry, error) {
 	_, err := doesMemberExist(newEntryInfo.MemberId)
 	if err != nil {
@@ -158,7 +183,7 @@ func createNewEntry(newEntry models.NewEntryInfos) (models.Entry, error) {
 	if err != nil {
 		return models.Entry{}, err
 	}
-	entry, err := db.getEntriesForEntryIdFromDB(int(entryId))
+	entry, err := db.getEntryForEntryIdFromDB(int(entryId))
 	if err != nil {
 		return models.Entry{}, err
 	}
@@ -170,7 +195,7 @@ func getEntryForEntryId(entryId int) (models.Entry, error) {
 	if err != nil {
 		return models.Entry{}, err
 	}
-	entry, err := db.getEntriesForEntryIdFromDB(entryId)
+	entry, err := db.getEntryForEntryIdFromDB(entryId)
 	if err != nil {
 		return models.Entry{}, err
 	}
@@ -186,27 +211,11 @@ func updateEntry(entryId int, diff int) (models.Entry, error) {
 	if err != nil {
 		return models.Entry{}, err
 	}
-	entry, err := db.getEntriesForEntryIdFromDB(entryId)
+	entry, err := db.getEntryForEntryIdFromDB(entryId)
 	if err != nil {
 		return models.Entry{}, err
 	}
 	return entry, nil
-}
-
-func deleteEntry(entryId int) (models.Entry, error) {
-	db, err := connect()
-	if err != nil {
-		return models.Entry{}, err
-	}
-	entryInfo, err := db.getEntriesForEntryIdFromDB(entryId)
-	if err != nil {
-		return models.Entry{}, err
-	}
-	err = db.deleteEntryFromDB(entryId)
-	if err != nil {
-		return models.Entry{}, err
-	}
-	return entryInfo, nil
 }
 
 func getAllEntriesByMemberId(memberId int) ([]models.Export, error) {
