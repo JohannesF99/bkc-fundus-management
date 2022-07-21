@@ -18,7 +18,7 @@ func deleteItem(itemId int) (models.Item, error) {
 		return models.Item{}, models.Error{
 			Details: "You can only delete this Item, when every borrowed piece has been returned.",
 			Path:    "/v1/item/:id",
-			Object:  item,
+			Object:  item.String(),
 			Time:    time.Now(),
 		}
 	}
@@ -79,20 +79,4 @@ func updateItemAvailability(itemId int, diff int) (int, error) {
 		return -1, err
 	}
 	return itemId, nil
-}
-
-func borrowedItemLost(itemId int, diff int) (models.Item, error) {
-	db, err := connect()
-	if err != nil {
-		return models.Item{}, err
-	}
-	err = db.updateCapacityInDB(itemId, -diff)
-	if err != nil {
-		return models.Item{}, err
-	}
-	item, err := db.getItemWithIdFromDB(itemId)
-	if err != nil {
-		return models.Item{}, err
-	}
-	return item, nil
 }

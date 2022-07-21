@@ -25,13 +25,10 @@ type Fundus interface {
 }
 
 func (m Member) String() string {
-	return "Member{" +
-		"ID" + strconv.Itoa(m.Id) +
-		"Name" + m.Name +
-		"Borrowed Items" + strconv.Itoa(m.BorrowedItemCount) +
-		"Comment" + m.Comment +
-		"Active" + strconv.FormatBool(m.Active) +
-		"Created" + m.Created.String() +
-		"Modified" + m.Modified.String() +
-		"}"
+	return "Member[ID: " + strconv.Itoa(m.Id) +
+		", Name: " + m.Name +
+		", Borrowed Items: " + strconv.Itoa(m.BorrowedItemCount) +
+		", Comment: " + m.Comment +
+		", Active: " + strconv.FormatBool(m.Active) +
+		"]"
 }

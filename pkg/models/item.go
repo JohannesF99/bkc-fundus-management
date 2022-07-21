@@ -22,13 +22,11 @@ type NewItemInfos struct {
 }
 
 func (i Item) String() string {
-	return "Item{" +
-		"ID" + strconv.Itoa(i.Id) +
-		"Name" + i.Name +
-		"Capacity" + strconv.Itoa(i.Capacity) +
-		"Available" + strconv.Itoa(i.Availability) +
-		"Description" + i.Description +
-		"Created" + i.Created.String() +
-		"Modified" + i.Modified.String() +
-		"}"
+	return "Item[" +
+		"ID: " + strconv.Itoa(i.Id) +
+		", Name: " + i.Name +
+		", Capacity: " + strconv.Itoa(i.Capacity) +
+		", Available: " + strconv.Itoa(i.Availability) +
+		", Description: " + i.Description +
+		"]"
 }

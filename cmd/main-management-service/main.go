@@ -21,18 +21,18 @@ func main() {
 	accounts := readValidAccountsFromFile()
 	authorized := r.Group("/v1/fundus/", gin.BasicAuth(accounts))
 	{
-		authorized.GET("member", getAllMember)                         //Check
-		authorized.GET("item", getAllItems)                            //Check
-		authorized.GET("member/:memberId/items", getAllItemsForMember) //Check
-		authorized.GET("item/:itemId/members", getAllMembersForItem)   //Check
-		authorized.POST("member", registerNewMember)                   //Check
-		authorized.POST("item", registerNewItem)                       //Check
-		authorized.POST("entry", borrowItem)                           //Check
+		authorized.GET("member", getAllMember)
+		authorized.GET("item", getAllItems)
+		authorized.GET("member/:memberId/items", getAllItemsForMember)
+		authorized.GET("item/:itemId/members", getAllMembersForItem)
+		authorized.POST("member", registerNewMember)
+		authorized.POST("item", registerNewItem)
+		authorized.POST("entry", borrowItem)
 		authorized.PUT("entry/:entryId", changeEntryCapacity)
 		authorized.PUT("entry/:entryId/lost/:diff", borrowedItemLost)
-		authorized.PUT("member/:memberId/status/:status", activateOrDeactivateMember) //Error
-		authorized.DELETE("entry/:entryId", removeEntry)                              //Check
-		authorized.DELETE("item/:itemId", removeItem)                                 //Check
+		authorized.PUT("member/:memberId/status/:status", activateOrDeactivateMember)
+		authorized.DELETE("entry/:entryId", removeEntry)
+		authorized.DELETE("item/:itemId", removeItem)
 	}
 	err := r.Run(":8083")
 	if err != nil {
@@ -61,7 +61,7 @@ func getAllMember(c *gin.Context) {
 		c.JSON(0, models.Error{
 			Details: err.Error(),
 			Path:    c.FullPath(),
-			Object:  nil,
+			Object:  "",
 			Time:    time.Now(),
 		})
 		return
@@ -73,7 +73,7 @@ func getAllMember(c *gin.Context) {
 		c.JSON(0, models.Error{
 			Details: err.Error(),
 			Path:    c.FullPath(),
-			Object:  nil,
+			Object:  "",
 			Time:    time.Now(),
 		})
 		return
@@ -87,7 +87,7 @@ func getAllItems(c *gin.Context) {
 		c.JSON(0, models.Error{
 			Details: err.Error(),
 			Path:    c.FullPath(),
-			Object:  nil,
+			Object:  "",
 			Time:    time.Now(),
 		})
 		return
@@ -99,7 +99,7 @@ func getAllItems(c *gin.Context) {
 		c.JSON(0, models.Error{
 			Details: err.Error(),
 			Path:    c.FullPath(),
-			Object:  nil,
+			Object:  "",
 			Time:    time.Now(),
 		})
 		return
@@ -113,7 +113,7 @@ func getAllItemsForMember(c *gin.Context) {
 		c.JSON(0, models.Error{
 			Details: err.Error(),
 			Path:    c.FullPath(),
-			Object:  nil,
+			Object:  "",
 			Time:    time.Now(),
 		})
 		return
@@ -123,7 +123,7 @@ func getAllItemsForMember(c *gin.Context) {
 		c.JSON(0, models.Error{
 			Details: err.Error(),
 			Path:    c.FullPath(),
-			Object:  nil,
+			Object:  "",
 			Time:    time.Now(),
 		})
 		return
@@ -135,7 +135,7 @@ func getAllItemsForMember(c *gin.Context) {
 		c.JSON(0, models.Error{
 			Details: err.Error(),
 			Path:    c.FullPath(),
-			Object:  nil,
+			Object:  "",
 			Time:    time.Now(),
 		})
 		return
@@ -149,7 +149,7 @@ func getAllMembersForItem(c *gin.Context) {
 		c.JSON(0, models.Error{
 			Details: err.Error(),
 			Path:    c.FullPath(),
-			Object:  nil,
+			Object:  "",
 			Time:    time.Now(),
 		})
 		return
@@ -159,7 +159,7 @@ func getAllMembersForItem(c *gin.Context) {
 		c.JSON(0, models.Error{
 			Details: err.Error(),
 			Path:    c.FullPath(),
-			Object:  nil,
+			Object:  "",
 			Time:    time.Now(),
 		})
 		return
@@ -171,7 +171,7 @@ func getAllMembersForItem(c *gin.Context) {
 		c.JSON(0, models.Error{
 			Details: err.Error(),
 			Path:    c.FullPath(),
-			Object:  nil,
+			Object:  "",
 			Time:    time.Now(),
 		})
 		return
@@ -186,7 +186,7 @@ func registerNewMember(c *gin.Context) {
 		c.JSON(0, models.Error{
 			Details: err.Error(),
 			Path:    c.FullPath(),
-			Object:  nil,
+			Object:  "",
 			Time:    time.Now(),
 		})
 		return
@@ -196,7 +196,7 @@ func registerNewMember(c *gin.Context) {
 		c.JSON(0, models.Error{
 			Details: err.Error(),
 			Path:    c.FullPath(),
-			Object:  nil,
+			Object:  "",
 			Time:    time.Now(),
 		})
 		return
@@ -207,7 +207,7 @@ func registerNewMember(c *gin.Context) {
 		c.JSON(0, models.Error{
 			Details: err.Error(),
 			Path:    c.FullPath(),
-			Object:  nil,
+			Object:  "",
 			Time:    time.Now(),
 		})
 		return
@@ -219,7 +219,7 @@ func registerNewMember(c *gin.Context) {
 		c.JSON(0, models.Error{
 			Details: err.Error(),
 			Path:    c.FullPath(),
-			Object:  nil,
+			Object:  "",
 			Time:    time.Now(),
 		})
 		return
@@ -234,7 +234,7 @@ func registerNewItem(c *gin.Context) {
 		c.JSON(0, models.Error{
 			Details: err.Error(),
 			Path:    c.FullPath(),
-			Object:  nil,
+			Object:  "",
 			Time:    time.Now(),
 		})
 		return
@@ -244,7 +244,7 @@ func registerNewItem(c *gin.Context) {
 		c.JSON(0, models.Error{
 			Details: err.Error(),
 			Path:    c.FullPath(),
-			Object:  nil,
+			Object:  "",
 			Time:    time.Now(),
 		})
 		return
@@ -255,7 +255,7 @@ func registerNewItem(c *gin.Context) {
 		c.JSON(0, models.Error{
 			Details: err.Error(),
 			Path:    c.FullPath(),
-			Object:  nil,
+			Object:  "",
 			Time:    time.Now(),
 		})
 		return
@@ -267,7 +267,7 @@ func registerNewItem(c *gin.Context) {
 		c.JSON(0, models.Error{
 			Details: err.Error(),
 			Path:    c.FullPath(),
-			Object:  nil,
+			Object:  "",
 			Time:    time.Now(),
 		})
 		return
@@ -282,7 +282,7 @@ func borrowItem(c *gin.Context) {
 		c.JSON(0, models.Error{
 			Details: err.Error(),
 			Path:    c.FullPath(),
-			Object:  nil,
+			Object:  "",
 			Time:    time.Now(),
 		})
 		return
@@ -292,7 +292,7 @@ func borrowItem(c *gin.Context) {
 		c.JSON(0, models.Error{
 			Details: err.Error(),
 			Path:    c.FullPath(),
-			Object:  nil,
+			Object:  "",
 			Time:    time.Now(),
 		})
 		return
@@ -303,9 +303,24 @@ func borrowItem(c *gin.Context) {
 		c.JSON(0, models.Error{
 			Details: err.Error(),
 			Path:    c.FullPath(),
-			Object:  nil,
+			Object:  "",
 			Time:    time.Now(),
 		})
+		return
+	}
+	if resp.StatusCode != 200 {
+		var apiError models.Error
+		err = json.NewDecoder(resp.Body).Decode(&apiError)
+		if err != nil {
+			c.JSON(0, models.Error{
+				Details: err.Error(),
+				Path:    c.FullPath(),
+				Object:  "",
+				Time:    time.Now(),
+			})
+			return
+		}
+		c.JSON(resp.StatusCode, err)
 		return
 	}
 	defer resp.Body.Close()
@@ -315,7 +330,7 @@ func borrowItem(c *gin.Context) {
 		c.JSON(0, models.Error{
 			Details: err.Error(),
 			Path:    c.FullPath(),
-			Object:  nil,
+			Object:  "",
 			Time:    time.Now(),
 		})
 		return
@@ -324,65 +339,63 @@ func borrowItem(c *gin.Context) {
 }
 
 func changeEntryCapacity(c *gin.Context) {
-	returned, err := strconv.Atoi(c.Query("returned"))
-	if err != nil {
-		c.JSON(0, models.Error{
-			Details: err.Error(),
-			Path:    c.FullPath(),
-			Object:  nil,
-			Time:    time.Now(),
-		})
-		return
-	}
 	entryId, err := strconv.Atoi(c.Param("entryId"))
 	if err != nil {
 		c.JSON(0, models.Error{
 			Details: err.Error(),
 			Path:    c.FullPath(),
-			Object:  nil,
+			Object:  "",
 			Time:    time.Now(),
 		})
 		return
 	}
-	existingEntry, err := doesEntryExistForEntryId(entryId)
+	returned, err := strconv.Atoi(c.Query("returned"))
 	if err != nil {
 		c.JSON(0, models.Error{
 			Details: err.Error(),
 			Path:    c.FullPath(),
-			Object:  nil,
+			Object:  strconv.Itoa(entryId),
 			Time:    time.Now(),
 		})
 		return
 	}
-	if existingEntry.Capacity < returned {
-		c.JSON(0, models.Error{
-			Details: "You tried to return more, than you had initially borrowed",
-			Path:    c.FullPath(),
-			Object:  nil,
-			Time:    time.Now(),
-		})
-		return
-	}
-	if existingEntry.Capacity == returned {
-		entry, err := removeExistingEntry(entryId)
-		if err != nil {
-			c.JSON(0, models.Error{
-				Details: err.Error(),
-				Path:    c.FullPath(),
-				Object:  nil,
-				Time:    time.Now(),
-			})
-			return
-		}
-		c.JSON(http.StatusOK, entry)
-		return
-	}
-	entry, err := updateEntry(entryId, -returned)
+	client := &http.Client{}
+	req, err := http.NewRequest(http.MethodPut, EntryService+
+		strconv.Itoa(entryId)+
+		"?returned="+strconv.Itoa(returned), nil)
 	if err != nil {
 		c.JSON(0, models.Error{
 			Details: err.Error(),
 			Path:    c.FullPath(),
-			Object:  nil,
+			Object:  strconv.Itoa(entryId),
+			Time:    time.Now(),
+		})
+		return
+	}
+	resp, err := client.Do(req)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, models.Error{
+			Details: err.Error(),
+			Path:    "Client-Request",
+			Object:  "",
+			Time:    time.Now(),
+		})
+		return
+	}
+	if resp.StatusCode != 200 {
+		var apiError models.Error
+		err = json.NewDecoder(resp.Body).Decode(&apiError)
+		c.JSON(resp.StatusCode, apiError)
+		return
+	}
+	defer resp.Body.Close()
+	var entry models.Entry
+	err = json.NewDecoder(resp.Body).Decode(&entry)
+	if err != nil {
+		c.JSON(0, models.Error{
+			Details: err.Error(),
+			Path:    c.FullPath(),
+			Object:  strconv.Itoa(entryId),
 			Time:    time.Now(),
 		})
 		return
@@ -399,31 +412,35 @@ func borrowedItemLost(c *gin.Context) {
 	if err != nil {
 		panic(err)
 	}
-	entry, err := doesEntryExistForEntryId(entryId)
+	client := &http.Client{}
+	req, err := http.NewRequest(http.MethodPut, EntryService+
+		strconv.Itoa(entryId)+
+		"/lost/"+strconv.Itoa(diff), nil)
 	if err != nil {
-		panic(err)
+		c.JSON(http.StatusBadRequest, models.Error{
+			Details: err.Error(),
+			Path:    c.FullPath(),
+			Object:  strconv.Itoa(entryId),
+			Time:    time.Now(),
+		})
+		return
 	}
-	item, err := doesItemExist(entry.ItemId)
+	resp, err := client.Do(req)
 	if err != nil {
-		panic(err)
+		c.JSON(http.StatusBadRequest, err)
+		return
 	}
-	member, err := doesMemberExist(entry.MemberId)
+	defer resp.Body.Close()
+	var item models.Item
+	err = json.NewDecoder(resp.Body).Decode(&item)
 	if err != nil {
-		panic(err)
-	}
-	if entry.Capacity == diff {
-		_, err := removeEntryWithoutSideeffects(entryId)
-		if err != nil {
-			panic(err)
-		}
-	}
-	member, err = changeMemberBorrowCount(member.Id, -diff)
-	if err != nil {
-		panic(err)
-	}
-	item, err = changeItemCapacity(item.Id, diff)
-	if err != nil {
-		panic(err)
+		c.JSON(http.StatusBadRequest, models.Error{
+			Details: err.Error(),
+			Path:    c.FullPath(),
+			Object:  strconv.Itoa(entryId),
+			Time:    time.Now(),
+		})
+		return
 	}
 	c.JSON(http.StatusOK, item)
 }
@@ -434,7 +451,7 @@ func activateOrDeactivateMember(c *gin.Context) {
 		c.JSON(http.StatusBadRequest, models.Error{
 			Details: err.Error(),
 			Path:    c.FullPath(),
-			Object:  nil,
+			Object:  "",
 			Time:    time.Now(),
 		})
 		return
@@ -444,33 +461,60 @@ func activateOrDeactivateMember(c *gin.Context) {
 		c.JSON(http.StatusBadRequest, models.Error{
 			Details: err.Error(),
 			Path:    c.FullPath(),
-			Object:  nil,
+			Object:  "",
 			Time:    time.Now(),
 		})
 		return
 	}
-	member, err := doesMemberExist(memberId)
+	client := &http.Client{}
+	req, err := http.NewRequest(http.MethodPut, MemberService+
+		strconv.Itoa(memberId)+
+		"/status/"+strconv.FormatBool(status), nil)
 	if err != nil {
 		c.JSON(http.StatusBadRequest, models.Error{
 			Details: err.Error(),
 			Path:    c.FullPath(),
-			Object:  nil,
+			Object:  "",
 			Time:    time.Now(),
 		})
 		return
 	}
-	if member.BorrowedItemCount > 0 {
-		c.JSON(http.StatusBadRequest, models.Error{
-			Details: "The Member has to return all borrowed Items before a Status change",
-			Path:    c.FullPath(),
-			Object:  member,
-			Time:    time.Now(),
-		})
-		return
-	}
-	member, err = changeMemberStatus(memberId, status)
+	resp, err := client.Do(req)
 	if err != nil {
-		panic(err)
+		c.JSON(http.StatusBadRequest, models.Error{
+			Details: err.Error(),
+			Path:    c.FullPath(),
+			Object:  "",
+			Time:    time.Now(),
+		})
+		return
+	}
+	defer resp.Body.Close()
+	if resp.StatusCode != 200 {
+		var apiError models.Error
+		err = json.NewDecoder(resp.Body).Decode(&apiError)
+		if err != nil {
+			c.JSON(http.StatusBadRequest, models.Error{
+				Details: err.Error(),
+				Path:    c.FullPath(),
+				Object:  "",
+				Time:    time.Now(),
+			})
+			return
+		}
+		c.JSON(http.StatusBadRequest, apiError)
+		return
+	}
+	var member models.Member
+	err = json.NewDecoder(resp.Body).Decode(&member)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, models.Error{
+			Details: err.Error(),
+			Path:    c.FullPath(),
+			Object:  "",
+			Time:    time.Now(),
+		})
+		return
 	}
 	c.JSON(http.StatusOK, member)
 }
@@ -481,7 +525,7 @@ func removeEntry(c *gin.Context) {
 		c.JSON(http.StatusBadRequest, models.Error{
 			Details: err.Error(),
 			Path:    c.FullPath(),
-			Object:  nil,
+			Object:  "",
 			Time:    time.Now(),
 		})
 		return
@@ -512,7 +556,7 @@ func removeItem(c *gin.Context) {
 		c.JSON(http.StatusBadRequest, models.Error{
 			Details: err.Error(),
 			Path:    c.FullPath(),
-			Object:  nil,
+			Object:  "",
 			Time:    time.Now(),
 		})
 		return
@@ -522,7 +566,7 @@ func removeItem(c *gin.Context) {
 		c.JSON(http.StatusBadRequest, models.Error{
 			Details: err.Error(),
 			Path:    c.FullPath(),
-			Object:  nil,
+			Object:  "",
 			Time:    time.Now(),
 		})
 		return
@@ -534,7 +578,7 @@ func removeItem(c *gin.Context) {
 		c.JSON(http.StatusBadRequest, models.Error{
 			Details: err.Error(),
 			Path:    c.FullPath(),
-			Object:  nil,
+			Object:  "",
 			Time:    time.Now(),
 		})
 		return

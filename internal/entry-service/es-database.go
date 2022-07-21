@@ -4,6 +4,7 @@ import (
 	"database/sql"
 	"github.com/JohannesF99/bkc-fundus-management/pkg/models"
 	_ "github.com/go-sql-driver/mysql"
+	"time"
 )
 
 type DB struct {
@@ -175,11 +176,21 @@ func (db DB) getEntryForEntryIdFromDB(entryId int) (models.Entry, error) {
 	tx, err := db.db.Begin()
 	defer tx.Commit()
 	if err != nil {
-		return models.Entry{}, err
+		return models.Entry{}, models.Error{
+			Details: err.Error(),
+			Path:    "ES-Database",
+			Object:  "",
+			Time:    time.Now(),
+		}
 	}
 	rows, err := tx.Query("SELECT * FROM bkc.entries WHERE id=?", entryId)
 	if err != nil {
-		return models.Entry{}, err
+		return models.Entry{}, models.Error{
+			Details: err.Error(),
+			Path:    "ES-Database",
+			Object:  "",
+			Time:    time.Now(),
+		}
 	}
 	defer rows.Close()
 	rows.Next()
@@ -192,7 +203,12 @@ func (db DB) getEntryForEntryIdFromDB(entryId int) (models.Entry, error) {
 		&newEntry.Created,
 		&newEntry.Modified)
 	if err != nil {
-		return models.Entry{}, err
+		return models.Entry{}, models.Error{
+			Details: err.Error(),
+			Path:    "ES-Database",
+			Object:  "",
+			Time:    time.Now(),
+		}
 	}
 	return newEntry, nil
 }

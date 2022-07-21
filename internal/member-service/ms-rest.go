@@ -5,6 +5,7 @@ import (
 	"github.com/gin-gonic/gin"
 	"net/http"
 	"strconv"
+	"time"
 )
 
 func StartMemberService() {
@@ -87,15 +88,28 @@ func updateBorrowCount(c *gin.Context) {
 func changeStatus(c *gin.Context) {
 	userId, err := strconv.Atoi(c.Param("id"))
 	if err != nil {
-		panic(err)
+		c.JSON(http.StatusBadRequest, models.Error{
+			Details: err.Error(),
+			Path:    c.FullPath(),
+			Object:  c.Param("id"),
+			Time:    time.Now(),
+		})
+		return
 	}
 	status, err := strconv.ParseBool(c.Param("status"))
 	if err != nil {
-		panic(err)
+		c.JSON(http.StatusBadRequest, models.Error{
+			Details: err.Error(),
+			Path:    c.FullPath(),
+			Object:  c.Param("status"),
+			Time:    time.Now(),
+		})
+		return
 	}
 	member, err := changeMemberStatus(userId, status)
 	if err != nil {
-		panic(err)
+		c.JSON(http.StatusBadRequest, err)
+		return
 	}
 	c.JSON(http.StatusOK, member)
 }

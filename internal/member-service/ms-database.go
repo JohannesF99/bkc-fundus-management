@@ -10,7 +10,7 @@ type DB struct {
 	db *sql.DB
 }
 
-func Connect() (DB, error) {
+func connect() (DB, error) {
 	db, err := sql.Open("mysql", "root:2678@/bkc?parseTime=true")
 	if err != nil {
 		return DB{}, err

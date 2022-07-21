@@ -15,7 +15,6 @@ func StartItemService() {
 		v1.GET("/:id", fetchItem)
 		v1.POST("/", addItem)
 		v1.PUT("/:id", updateItem)
-		v1.PUT("/:id/lost/:diff", lostItem)
 		v1.DELETE("/:id", removeItem)
 	}
 	err := r.Run("localhost:8081")
@@ -91,22 +90,6 @@ func removeItem(c *gin.Context) {
 		panic(err)
 	}
 	item, err := deleteItem(itemId)
-	if err != nil {
-		panic(err)
-	}
-	c.JSON(http.StatusOK, item)
-}
-
-func lostItem(c *gin.Context) {
-	itemId, err := strconv.Atoi(c.Param("id"))
-	if err != nil {
-		panic(err)
-	}
-	diff, err := strconv.Atoi(c.Param("diff"))
-	if err != nil {
-		panic(err)
-	}
-	item, err := borrowedItemLost(itemId, diff)
 	if err != nil {
 		panic(err)
 	}

@@ -2,10 +2,11 @@ package member
 
 import (
 	"github.com/JohannesF99/bkc-fundus-management/pkg/models"
+	"time"
 )
 
 func getAllMembers() ([]models.Member, error) {
-	db, err := Connect()
+	db, err := connect()
 	if err != nil {
 		return nil, err
 	}
@@ -17,7 +18,7 @@ func getAllMembers() ([]models.Member, error) {
 }
 
 func getMemberWithUserId(userId int) (models.Member, error) {
-	db, err := Connect()
+	db, err := connect()
 	if err != nil {
 		return models.Member{}, err
 	}
@@ -29,7 +30,7 @@ func getMemberWithUserId(userId int) (models.Member, error) {
 }
 
 func insertNewMember(newMember models.NewMemberInfos) (int64, error) {
-	db, err := Connect()
+	db, err := connect()
 	if err != nil {
 		return -1, err
 	}
@@ -44,7 +45,7 @@ func insertNewMember(newMember models.NewMemberInfos) (int64, error) {
 }
 
 func updateMemberBorrowCount(userId int, diff int) (int, error) {
-	db, _ := Connect()
+	db, _ := connect()
 	count, err := db.UpdateBorrowedItemCount(userId, diff)
 	if err != nil {
 		return -1, err
@@ -52,16 +53,28 @@ func updateMemberBorrowCount(userId int, diff int) (int, error) {
 	return count, nil
 }
 
-func changeMemberStatus(userId int, status bool) (models.Member, error) {
-	db, err := Connect()
+func changeMemberStatus(memberId int, status bool) (models.Member, error) {
+	db, err := connect()
 	if err != nil {
 		return models.Member{}, err
 	}
-	err = db.ChangeMemberStatus(userId, status)
+	member, err := db.GetMemberWithId(memberId)
 	if err != nil {
 		return models.Member{}, err
 	}
-	member, err := db.GetMemberWithId(userId)
+	if member.BorrowedItemCount > 0 {
+		return models.Member{}, models.Error{
+			Details: "User-Status cannot be changed until every borrowed Item has been returned",
+			Path:    "/v1/member/:id/status/:status",
+			Object:  member.String(),
+			Time:    time.Now(),
+		}
+	}
+	err = db.ChangeMemberStatus(memberId, status)
+	if err != nil {
+		return models.Member{}, err
+	}
+	member, err = db.GetMemberWithId(memberId)
 	if err != nil {
 		return models.Member{}, err
 	}

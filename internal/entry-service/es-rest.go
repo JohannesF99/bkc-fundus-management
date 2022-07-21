@@ -5,6 +5,7 @@ import (
 	"github.com/gin-gonic/gin"
 	"net/http"
 	"strconv"
+	"time"
 )
 
 func StartEntryService() {
@@ -18,6 +19,7 @@ func StartEntryService() {
 		v1.GET("/member/:memberId/item/:itemId", entryForMemberIdAndItemId)
 		v1.POST("", newEntry)
 		v1.PUT("/:entryId", changeEntry)
+		v1.PUT("/:entryId/lost/:lost", lostItem)
 		v1.DELETE("/:entryId", removeEntry)
 	}
 	err := r.Run("localhost:8080")
@@ -74,11 +76,18 @@ func newEntry(c *gin.Context) {
 	var newEntry models.NewEntryInfos
 	err := c.BindJSON(&newEntry)
 	if err != nil {
-		panic(err)
+		c.JSON(http.StatusBadRequest, models.Error{
+			Details: "Problem Binding Request Body",
+			Path:    "/v1/entry",
+			Object:  "",
+			Time:    time.Now(),
+		})
+		return
 	}
 	entry, err := createNewEntryOrUpdate(newEntry)
 	if err != nil {
-		panic(err)
+		c.JSON(http.StatusBadRequest, err)
+		return
 	}
 	c.JSON(http.StatusOK, entry)
 }
@@ -86,19 +95,28 @@ func newEntry(c *gin.Context) {
 func changeEntry(c *gin.Context) {
 	entryId, err := strconv.Atoi(c.Param("entryId"))
 	if err != nil {
-		panic(err)
-	}
-	borrowed, err := strconv.Atoi(c.DefaultQuery("borrowed", "0"))
-	if err != nil {
-		panic(err)
+		c.JSON(http.StatusBadRequest, models.Error{
+			Details: "Problem parsing Parameter Entry-ID",
+			Path:    "/v1/entry/:entryId",
+			Object:  c.Param("entryId"),
+			Time:    time.Now(),
+		})
+		return
 	}
 	returned, err := strconv.Atoi(c.DefaultQuery("returned", "0"))
 	if err != nil {
-		panic(err)
+		c.JSON(http.StatusBadRequest, models.Error{
+			Details: "Problem parsing Parameter Returned",
+			Path:    "/v1/entry/:entryId",
+			Object:  c.DefaultQuery("returned", "0"),
+			Time:    time.Now(),
+		})
+		return
 	}
-	entry, err := updateEntry(entryId, borrowed-returned)
+	entry, err := updateEntry(entryId, returned)
 	if err != nil {
-		panic(err)
+		c.JSON(http.StatusBadRequest, err)
+		return
 	}
 	c.JSON(http.StatusOK, entry)
 }
@@ -113,6 +131,35 @@ func removeEntry(c *gin.Context) {
 		panic(err)
 	}
 	c.JSON(http.StatusOK, entry)
+}
+
+func lostItem(c *gin.Context) {
+	entryId, err := strconv.Atoi(c.Param("entryId"))
+	if err != nil {
+		c.JSON(http.StatusBadRequest, models.Error{
+			Details: "Problems parsing Parameter Entry-ID",
+			Path:    "/v1/entry/:id/lost/:diff",
+			Object:  "",
+			Time:    time.Now(),
+		})
+		return
+	}
+	lost, err := strconv.Atoi(c.Param("lost"))
+	if err != nil {
+		c.JSON(http.StatusBadRequest, models.Error{
+			Details: "Problems parsing Parameter Diff",
+			Path:    "/v1/entry/:id/lost/:diff",
+			Object:  strconv.Itoa(entryId),
+			Time:    time.Now(),
+		})
+		return
+	}
+	item, err := borrowedItemLost(entryId, lost)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, err)
+		return
+	}
+	c.JSON(http.StatusOK, item)
 }
 
 func entryForMemberIdAndItemId(c *gin.Context) {
