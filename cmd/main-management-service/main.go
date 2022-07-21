@@ -9,6 +9,7 @@ import (
 	"net/http"
 	"os"
 	"strconv"
+	"time"
 )
 
 const EntryService = constants.EntryService
@@ -164,42 +165,53 @@ func registerNewItem(c *gin.Context) {
 }
 
 func borrowItem(c *gin.Context) {
+	//Parse Request Body To Object
 	var newEntryInfos models.NewEntryInfos
 	err := c.BindJSON(&newEntryInfos)
 	if err != nil {
-		panic(err)
-	}
-	_, err = doesMemberExist(newEntryInfos.MemberId)
-	if err != nil {
-		panic(err)
-	}
-	item, err := doesItemExist(newEntryInfos.ItemId)
-	if err != nil {
-		panic(err)
-	}
-	if item.Availability < newEntryInfos.Capacity {
-		c.JSON(http.StatusConflict, gin.H{
-			"message":   "Not enough capacity",
-			"available": item.Availability,
-			"requested": newEntryInfos.Capacity,
+		c.JSON(0, models.Error{
+			Details: err.Error(),
+			Path:    c.FullPath(),
+			Object:  nil,
+			Time:    time.Now(),
 		})
 		return
 	}
-	if existingEntry, err := doesEntryExistForMemberAndItem(newEntryInfos.MemberId, newEntryInfos.ItemId); err == nil {
-		updatedEntry, err := updateEntry(existingEntry.Id, newEntryInfos.Capacity)
-		if err != nil {
-			panic(err)
-		}
-		c.JSON(http.StatusOK, updatedEntry)
-		return
-	} else {
-		newEntry, err := createNewEntry(newEntryInfos)
-		if err != nil {
-			panic(err)
-		}
-		c.JSON(http.StatusOK, newEntry)
+	//Forward Request To Entry-Service
+	postBody, err := json.Marshal(newEntryInfos)
+	if err != nil {
+		c.JSON(0, models.Error{
+			Details: err.Error(),
+			Path:    c.FullPath(),
+			Object:  nil,
+			Time:    time.Now(),
+		})
 		return
 	}
+	responseBody := bytes.NewBuffer(postBody)
+	resp, err := http.Post(EntryService, "application/json", responseBody)
+	if err != nil {
+		c.JSON(0, models.Error{
+			Details: err.Error(),
+			Path:    c.FullPath(),
+			Object:  nil,
+			Time:    time.Now(),
+		})
+		return
+	}
+	defer resp.Body.Close()
+	var newEntry models.Entry
+	err = json.NewDecoder(resp.Body).Decode(&newEntry)
+	if err != nil {
+		c.JSON(0, models.Error{
+			Details: err.Error(),
+			Path:    c.FullPath(),
+			Object:  nil,
+			Time:    time.Now(),
+		})
+		return
+	}
+	c.JSON(http.StatusOK, newEntry)
 }
 
 func changeEntryCapacity(c *gin.Context) {

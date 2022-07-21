@@ -76,7 +76,7 @@ func newEntry(c *gin.Context) {
 	if err != nil {
 		panic(err)
 	}
-	entry, err := createNewEntry(newEntry)
+	entry, err := createNewEntryOrUpdate(newEntry)
 	if err != nil {
 		panic(err)
 	}

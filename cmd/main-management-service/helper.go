@@ -1,7 +1,6 @@
 package main
 
 import (
-	"bytes"
 	"encoding/json"
 	"errors"
 	"github.com/JohannesF99/bkc-fundus-management/pkg/models"
@@ -134,33 +133,6 @@ func removeExistingEntry(entryId int) (models.Entry, error) {
 	return entry, nil
 }
 
-func createNewEntry(newEntryInfos models.NewEntryInfos) (models.Entry, error) {
-	postBody, err := json.Marshal(newEntryInfos)
-	if err != nil {
-		return models.Entry{}, err
-	}
-	responseBody := bytes.NewBuffer(postBody)
-	postResp, err := http.Post(EntryService, "application/json", responseBody)
-	if err != nil {
-		return models.Entry{}, err
-	}
-	defer postResp.Body.Close()
-	var newEntry models.Entry
-	err = json.NewDecoder(postResp.Body).Decode(&newEntry)
-	if err != nil {
-		return models.Entry{}, err
-	}
-	_, err = changeItemAvailability(newEntryInfos.ItemId, newEntryInfos.Capacity)
-	if err != nil {
-		panic(err)
-	}
-	_, err = changeMemberBorrowCount(newEntryInfos.MemberId, newEntryInfos.Capacity)
-	if err != nil {
-		panic(err)
-	}
-	return newEntry, nil
-}
-
 func changeItemAvailability(itemId int, borrowed int) (models.Item, error) {
 	req, err := http.NewRequest(http.MethodPut,
 		ItemService+strconv.Itoa(itemId)+
@@ -237,25 +209,6 @@ func doesItemExist(itemId int) (models.Item, error) {
 		return models.Item{}, err
 	}
 	return itemInfo, nil
-}
-
-func doesEntryExistForMemberAndItem(memberId int, itemId int) (models.Entry, error) {
-	resp, err := http.Get(EntryService +
-		"member/" + strconv.Itoa(memberId) +
-		"/item/" + strconv.Itoa(itemId))
-	if err != nil {
-		return models.Entry{}, err
-	}
-	defer resp.Body.Close()
-	var existingEntry models.Entry
-	err = json.NewDecoder(resp.Body).Decode(&existingEntry)
-	if err != nil {
-		return models.Entry{}, err
-	}
-	if resp.StatusCode != 200 {
-		return models.Entry{}, errors.New("no existing Entry found")
-	}
-	return existingEntry, nil
 }
 
 func doesEntryExistForEntryId(entryId int) (models.Entry, error) {
