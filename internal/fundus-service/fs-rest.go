@@ -21,20 +21,26 @@ const (
 func StartFundusService() {
 	r := gin.Default()
 	accounts := readValidAccountsFromFile()
-	authorized := r.Group("/v1/fundus/", gin.BasicAuth(accounts))
+	private := r.Group("/v1/fundus/", gin.BasicAuth(accounts))
 	{
-		authorized.GET("member", getAllMember)
-		authorized.GET("item", getAllItems)
-		authorized.GET("member/:memberId/items", getAllItemsForMember)
-		authorized.GET("item/:itemId/members", getAllMembersForItem)
-		authorized.POST("member", registerNewMember)
-		authorized.POST("item", registerNewItem)
-		authorized.POST("entry", borrowItem)
-		authorized.PUT("entry/:entryId", changeEntryCapacity)
-		authorized.PUT("entry/:entryId/lost/:diff", borrowedItemLost)
-		authorized.PUT("member/:memberId/status/:status", activateOrDeactivateMember)
-		authorized.DELETE("entry/:entryId", removeEntry)
-		authorized.DELETE("item/:itemId", removeItem)
+		private.GET("member", getAllMember)
+		private.GET("item", getAllItems)
+		private.GET("member/:memberId/items", getAllItemsForMember)
+		private.GET("item/:itemId/members", getAllMembersForItem)
+		private.GET("entry/all", getAllEntriesForAllMembers)
+		private.POST("member", registerNewMember)
+		private.POST("item", registerNewItem)
+		private.POST("entry", borrowItem)
+		private.PUT("entry/:entryId", changeEntryCapacity)
+		private.PUT("entry/:entryId/lost/:diff", borrowedItemLost)
+		private.PUT("member/:memberId/status/:status", activateOrDeactivateMember)
+		private.DELETE("entry/:entryId", removeEntry)
+		private.DELETE("item/:itemId", removeItem)
+	}
+	r.LoadHTMLGlob("pkg/html/index.html")
+	public := r.Group("v1/fundus/public/")
+	{
+		public.GET("entries", showAllEntries)
 	}
 	err := r.Run(":8083")
 	if err != nil {
@@ -774,4 +780,88 @@ func removeItem(c *gin.Context) {
 		return
 	}
 	c.JSON(http.StatusOK, item)
+}
+
+func getAllEntriesForAllMembers(c *gin.Context) {
+	resp, err := http.Get(EntryService + "member/all")
+	if err != nil {
+		c.JSON(0, models.Error{
+			Details: err.Error(),
+			Path:    c.FullPath(),
+			Object:  "",
+			Time:    time.Now(),
+		})
+		return
+	}
+	if resp.StatusCode != 200 {
+		var apiError models.Error
+		err = json.NewDecoder(resp.Body).Decode(&apiError)
+		if err != nil {
+			c.JSON(http.StatusBadRequest, models.Error{
+				Details: err.Error(),
+				Path:    c.FullPath(),
+				Object:  "",
+				Time:    time.Now(),
+			})
+			return
+		}
+		c.JSON(resp.StatusCode, apiError)
+		return
+	}
+	defer resp.Body.Close()
+	var entryList []models.ExpandedExport
+	err = json.NewDecoder(resp.Body).Decode(&entryList)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, models.Error{
+			Details: err.Error(),
+			Path:    c.FullPath(),
+			Object:  "",
+			Time:    time.Now(),
+		})
+		return
+	}
+	c.JSON(http.StatusOK, entryList)
+}
+
+func showAllEntries(c *gin.Context) {
+	resp, err := http.Get(EntryService + "member/all")
+	if err != nil {
+		c.JSON(0, models.Error{
+			Details: err.Error(),
+			Path:    c.FullPath(),
+			Object:  "",
+			Time:    time.Now(),
+		})
+		return
+	}
+	if resp.StatusCode != 200 {
+		var apiError models.Error
+		err = json.NewDecoder(resp.Body).Decode(&apiError)
+		if err != nil {
+			c.JSON(http.StatusBadRequest, models.Error{
+				Details: err.Error(),
+				Path:    c.FullPath(),
+				Object:  "",
+				Time:    time.Now(),
+			})
+			return
+		}
+		c.JSON(resp.StatusCode, apiError)
+		return
+	}
+	defer resp.Body.Close()
+	var entryList []models.ExpandedExport
+	err = json.NewDecoder(resp.Body).Decode(&entryList)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, models.Error{
+			Details: err.Error(),
+			Path:    c.FullPath(),
+			Object:  "",
+			Time:    time.Now(),
+		})
+		return
+	}
+	c.HTML(http.StatusOK, "index.html", gin.H{
+		"entryList": entryList,
+	})
 }

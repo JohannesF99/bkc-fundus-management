@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <title>BKC Fundus Überlick</title>
+</head>
+<body>
+<h1>BKC Fundus Überlick</h1>
+<table cellpadding="5" cellspacing="5">
+{{ range .entryList }}
+    <tr>
+        <th>Mitglieds-ID</th>
+        <th>Name</th>
+        <th>Kostüm</th>
+        <th>Anzahl</th>
+        <th>Datum</th>
+    </tr>
+    <tr>
+        <td>{{ .MemberId }}</td>
+        <td>{{ .MemberName }}</td>
+        <td>{{ .ItemName }}</td>
+        <td>{{ .ItemCapacity }}</td>
+        <td>{{ .EntryDate }} </td>
+    </tr>
+{{ end }}
+</table>
+</body>
+</html>
