@@ -26,7 +26,7 @@ func connect() (DB, error) {
 }
 
 func (db DB) GetAllMembers() ([]models.Member, error) {
-	var members []models.Member
+	members := []models.Member{}
 	tx, err := db.db.Begin()
 	defer tx.Commit()
 	if err != nil {

@@ -26,7 +26,7 @@ func connect() (DB, error) {
 }
 
 func (db DB) getAllItemsFromDB() ([]models.Item, error) {
-	var items []models.Item
+	items := []models.Item{}
 	tx, err := db.db.Begin()
 	defer tx.Commit()
 	if err != nil {
