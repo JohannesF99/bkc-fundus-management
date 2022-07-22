@@ -16,7 +16,7 @@ func TestMember_String(t *testing.T) {
 		Created:           time.Now(),
 		Modified:          time.Now(),
 	}
-	expected := "Member[ID: 1, Name: Johannes, Borrowed Items: 15, Comment: Test, Active: true]"
+	expected := "Member[ ID: 1, Name: Johannes, Borrowed Items: 15, Comment: Test, Active: true]"
 	//when
 	result := testMember.String()
 	//then
