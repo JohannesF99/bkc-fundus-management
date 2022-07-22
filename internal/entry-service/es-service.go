@@ -119,7 +119,12 @@ func changeItemAvailability(itemId int, returned int) (models.Item, error) {
 		var apiError models.Error
 		err = json.NewDecoder(resp.Body).Decode(&apiError)
 		if err != nil {
-			return models.Item{}, err
+			return models.Item{}, models.Error{
+				Details: err.Error(),
+				Path:    "Entry Service - changeItemAvailability",
+				Object:  "",
+				Time:    time.Now(),
+			}
 		}
 		return models.Item{}, apiError
 	}
@@ -164,7 +169,12 @@ func changeMemberBorrowCount(memberId int, returned int) (models.Member, error) 
 		var apiError models.Error
 		err = json.NewDecoder(resp.Body).Decode(&apiError)
 		if err != nil {
-			return models.Member{}, err
+			return models.Member{}, models.Error{
+				Details: err.Error(),
+				Path:    "Entry Service - changeItemAvailability",
+				Object:  "",
+				Time:    time.Now(),
+			}
 		}
 		return models.Member{}, apiError
 	}
@@ -196,7 +206,12 @@ func doesMemberExist(memberId int) (models.Member, error) {
 		var apiError models.Error
 		err = json.NewDecoder(resp.Body).Decode(&apiError)
 		if err != nil {
-			return models.Member{}, err
+			return models.Member{}, models.Error{
+				Details: err.Error(),
+				Path:    "Entry Service - changeItemAvailability",
+				Object:  "",
+				Time:    time.Now(),
+			}
 		}
 		return models.Member{}, apiError
 	}
@@ -228,7 +243,12 @@ func doesItemExist(itemId int) (models.Item, error) {
 		var apiError models.Error
 		err = json.NewDecoder(resp.Body).Decode(&apiError)
 		if err != nil {
-			return models.Item{}, err
+			return models.Item{}, models.Error{
+				Details: err.Error(),
+				Path:    "Entry Service - changeItemAvailability",
+				Object:  "",
+				Time:    time.Now(),
+			}
 		}
 		return models.Item{}, apiError
 	}
@@ -388,7 +408,12 @@ func requestItemFromItemService(itemId int) (models.Item, error) {
 		var apiError models.Error
 		err = json.NewDecoder(resp.Body).Decode(&apiError)
 		if err != nil {
-			return models.Item{}, err
+			return models.Item{}, models.Error{
+				Details: err.Error(),
+				Path:    "Entry Service - changeItemAvailability",
+				Object:  "",
+				Time:    time.Now(),
+			}
 		}
 		return models.Item{}, apiError
 	}
@@ -449,7 +474,12 @@ func requestMemberFromMemberService(memberId int) (models.Member, error) {
 		var apiError models.Error
 		err = json.NewDecoder(resp.Body).Decode(&apiError)
 		if err != nil {
-			return models.Member{}, err
+			return models.Member{}, models.Error{
+				Details: err.Error(),
+				Path:    "Entry Service - changeItemAvailability",
+				Object:  "",
+				Time:    time.Now(),
+			}
 		}
 		return models.Member{}, apiError
 	}
@@ -560,7 +590,12 @@ func changeItemCapacity(itemId int, diff int) (models.Item, error) {
 		var apiError models.Error
 		err = json.NewDecoder(resp.Body).Decode(&apiError)
 		if err != nil {
-			return models.Item{}, err
+			return models.Item{}, models.Error{
+				Details: err.Error(),
+				Path:    "Entry Service - changeItemCapacity()",
+				Object:  "",
+				Time:    time.Now(),
+			}
 		}
 		return models.Item{}, apiError
 	}
@@ -576,4 +611,58 @@ func changeItemCapacity(itemId int, diff int) (models.Item, error) {
 		}
 	}
 	return item, nil
+}
+
+func getEntriesForAllMember() ([]models.ExpandedExport, error) {
+	resp, err := http.Get(MemberService)
+	if err != nil {
+		return nil, models.Error{
+			Details: err.Error(),
+			Path:    "Entry Service - changeItemCapacity()",
+			Object:  "",
+			Time:    time.Now(),
+		}
+	}
+	if resp.StatusCode != 200 {
+		var apiError models.Error
+		err = json.NewDecoder(resp.Body).Decode(&apiError)
+		if err != nil {
+			return nil, models.Error{
+				Details: err.Error(),
+				Path:    "Entry Service - changeItemCapacity()",
+				Object:  "",
+				Time:    time.Now(),
+			}
+		}
+		return nil, apiError
+	}
+	defer resp.Body.Close()
+	var memberList []models.Member
+	err = json.NewDecoder(resp.Body).Decode(&memberList)
+	if err != nil {
+		return nil, models.Error{
+			Details: err.Error(),
+			Path:    "Entry Service - changeItemCapacity()",
+			Object:  "",
+			Time:    time.Now(),
+		}
+	}
+	entryExportList := []models.ExpandedExport{}
+	for _, member := range memberList {
+		entries, err := getAllEntriesByMemberId(member.Id)
+		if err != nil {
+			return nil, err
+		}
+		for _, entry := range entries {
+			entryExportList = append(entryExportList, models.ExpandedExport{
+				MemberId:     member.Id,
+				MemberName:   member.Name,
+				ItemId:       entry.Id,
+				ItemName:     entry.Name,
+				ItemCapacity: entry.Capacity,
+				EntryDate:    entry.Date,
+			})
+		}
+	}
+	return entryExportList, nil
 }

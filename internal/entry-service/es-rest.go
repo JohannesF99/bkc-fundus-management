@@ -15,6 +15,7 @@ func StartEntryService() {
 		v1.GET("", allEntries)
 		v1.GET("/:entryId", singleEntry)
 		v1.GET("/member/:memberId", allEntriesForMemberId)
+		v1.GET("/member/all", allEntriesForAllMember)
 		v1.GET("/item/:itemId", allEntriesForItemId)
 		v1.GET("/member/:memberId/item/:itemId", entryForMemberIdAndItemId)
 		v1.POST("", newEntry)
@@ -73,6 +74,15 @@ func allEntriesForMemberId(c *gin.Context) {
 		return
 	}
 	c.JSON(http.StatusOK, entries)
+}
+
+func allEntriesForAllMember(c *gin.Context) {
+	entriesForAllMember, err := getEntriesForAllMember()
+	if err != nil {
+		c.JSON(http.StatusBadRequest, err)
+		return
+	}
+	c.JSON(http.StatusOK, entriesForAllMember)
 }
 
 func allEntriesForItemId(c *gin.Context) {
