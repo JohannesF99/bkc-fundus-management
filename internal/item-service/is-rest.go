@@ -1,14 +1,31 @@
 package items
 
 import (
+	"errors"
 	"github.com/JohannesF99/bkc-fundus-management/pkg/models"
 	"github.com/gin-gonic/gin"
+	"io"
 	"net/http"
+	"os"
 	"strconv"
 	"time"
 )
 
 func StartItemService() {
+	//Preparation
+	if _, err := os.Stat("logs"); errors.Is(err, os.ErrNotExist) {
+		err := os.Mkdir("logs", os.ModePerm)
+		if err != nil {
+			panic(err)
+		}
+	}
+	file, err := os.Create("logs/item-service.log")
+	if err != nil {
+		panic(err)
+	}
+	gin.DefaultWriter = io.MultiWriter(file, os.Stdout)
+	gin.SetMode(gin.ReleaseMode)
+	//Start Server
 	r := gin.Default()
 	v1 := r.Group("/v1/item")
 	{
@@ -19,7 +36,7 @@ func StartItemService() {
 		v1.PUT("/:id/lost/:lost", lostItem)
 		v1.DELETE("/:id", removeItem)
 	}
-	err := r.Run("localhost:8081")
+	err = r.Run("localhost:8081")
 	if err != nil {
 		panic(err)
 	}

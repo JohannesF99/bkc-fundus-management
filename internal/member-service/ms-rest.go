@@ -1,14 +1,31 @@
 package member
 
 import (
+	"errors"
 	"github.com/JohannesF99/bkc-fundus-management/pkg/models"
 	"github.com/gin-gonic/gin"
+	"io"
 	"net/http"
+	"os"
 	"strconv"
 	"time"
 )
 
 func StartMemberService() {
+	//Preparation
+	if _, err := os.Stat("logs"); errors.Is(err, os.ErrNotExist) {
+		err := os.Mkdir("logs", os.ModePerm)
+		if err != nil {
+			panic(err)
+		}
+	}
+	file, err := os.Create("logs/member-service.log")
+	if err != nil {
+		panic(err)
+	}
+	gin.DefaultWriter = io.MultiWriter(file, os.Stdout)
+	gin.SetMode(gin.ReleaseMode)
+	//Start Server
 	r := gin.Default()
 	v1 := r.Group("/v1/member")
 	{
@@ -18,7 +35,7 @@ func StartMemberService() {
 		v1.PUT("/:id", updateBorrowCount)
 		v1.PUT("/:id/status/:status", changeStatus)
 	}
-	err := r.Run("localhost:8082")
+	err = r.Run("localhost:8082")
 	if err != nil {
 		panic(err)
 	}

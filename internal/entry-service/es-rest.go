@@ -1,14 +1,31 @@
 package entry
 
 import (
+	"errors"
 	"github.com/JohannesF99/bkc-fundus-management/pkg/models"
 	"github.com/gin-gonic/gin"
+	"io"
 	"net/http"
+	"os"
 	"strconv"
 	"time"
 )
 
 func StartEntryService() {
+	//Preparation
+	if _, err := os.Stat("logs"); errors.Is(err, os.ErrNotExist) {
+		err := os.Mkdir("logs", os.ModePerm)
+		if err != nil {
+			panic(err)
+		}
+	}
+	file, err := os.Create("logs/entry-service.log")
+	if err != nil {
+		panic(err)
+	}
+	gin.DefaultWriter = io.MultiWriter(file, os.Stdout)
+	gin.SetMode(gin.ReleaseMode)
+	//Start Server
 	r := gin.Default()
 	v1 := r.Group("/v1/entry")
 	{
@@ -23,7 +40,7 @@ func StartEntryService() {
 		v1.PUT("/:entryId/lost/:lost", lostItem)
 		v1.DELETE("/:entryId", removeEntry)
 	}
-	err := r.Run("localhost:8080")
+	err = r.Run("localhost:8080")
 	if err != nil {
 		panic(err)
 	}

@@ -3,9 +3,11 @@ package fundus
 import (
 	"bytes"
 	"encoding/json"
+	"errors"
 	"github.com/JohannesF99/bkc-fundus-management/pkg/constants"
 	"github.com/JohannesF99/bkc-fundus-management/pkg/models"
 	"github.com/gin-gonic/gin"
+	"io"
 	"net/http"
 	"os"
 	"strconv"
@@ -19,6 +21,20 @@ const (
 )
 
 func StartFundusService() {
+	//Preparation
+	if _, err := os.Stat("logs"); errors.Is(err, os.ErrNotExist) {
+		err := os.Mkdir("logs", os.ModePerm)
+		if err != nil {
+			panic(err)
+		}
+	}
+	file, err := os.Create("logs/fundus-service.log")
+	if err != nil {
+		panic(err)
+	}
+	gin.DefaultWriter = io.MultiWriter(file, os.Stdout)
+	gin.SetMode(gin.ReleaseMode)
+	//Start Server
 	r := gin.Default()
 	accounts := readValidAccountsFromFile()
 	private := r.Group("/v1/fundus/", gin.BasicAuth(accounts))
@@ -42,7 +58,7 @@ func StartFundusService() {
 	{
 		public.GET("entries", showAllEntries)
 	}
-	err := r.Run(":8083")
+	err = r.Run(":8083")
 	if err != nil {
 		panic(err)
 	}
