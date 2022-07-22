@@ -58,7 +58,7 @@ func StartFundusService() {
 	{
 		public.GET("entries", showAllEntries)
 	}
-	err = r.Run(":8083")
+	err = r.Run(":8080")
 	if err != nil {
 		panic(err)
 	}
