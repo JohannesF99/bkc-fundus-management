@@ -5,8 +5,8 @@
 </head>
 <body>
 <h1>BKC Fundus Überlick</h1>
-<table cellpadding="5" cellspacing="5">
-    <tr>
+<table cellpadding="5" cellspacing="5" align="center">
+    <tr align="left">
         <th>Mitglieds-ID</th>
         <th>Name</th>
         <th>Kostüm</th>
@@ -14,7 +14,7 @@
         <th>Datum</th>
     </tr>
     {{ range .entryList }}
-    <tr>
+    <tr align="left">
         <td>{{ .MemberId }}</td>
         <td>{{ .MemberName }}</td>
         <td>{{ .ItemName }}</td>
