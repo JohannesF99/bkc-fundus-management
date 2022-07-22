@@ -321,7 +321,7 @@
 						"method": "GET",
 						"header": [],
 						"url": {
-							"raw": "{{URL}}:8080/v1/entry/member/{{MEMBER_ID}}",
+							"raw": "{{URL}}:8080/v1/entry/member/1",
 							"host": [
 								"{{URL}}"
 							],
@@ -330,7 +330,28 @@
 								"v1",
 								"entry",
 								"member",
-								"{{MEMBER_ID}}"
+								"1"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get All Entries For All Members",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{URL}}:8080/v1/entry/member/all",
+							"host": [
+								"{{URL}}"
+							],
+							"port": "8080",
+							"path": [
+								"v1",
+								"entry",
+								"member",
+								"all"
 							]
 						}
 					},
