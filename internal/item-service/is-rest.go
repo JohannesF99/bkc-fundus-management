@@ -16,6 +16,7 @@ func StartItemService() {
 		v1.GET("/:id", fetchItem)
 		v1.POST("/", addItem)
 		v1.PUT("/:id", updateItem)
+		v1.PUT("/:id/lost/:lost", lostItem)
 		v1.DELETE("/:id", removeItem)
 	}
 	err := r.Run("localhost:8081")
@@ -114,6 +115,35 @@ func updateItem(c *gin.Context) {
 		return
 	}
 	item, err := getItemWithId(id)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, err)
+		return
+	}
+	c.JSON(http.StatusOK, item)
+}
+
+func lostItem(c *gin.Context) {
+	itemId, err := strconv.Atoi(c.Param("id"))
+	if err != nil {
+		c.JSON(http.StatusBadRequest, models.Error{
+			Details: err.Error(),
+			Path:    "Item Service - removeItem()",
+			Object:  c.Param("id"),
+			Time:    time.Now(),
+		})
+		return
+	}
+	lost, err := strconv.Atoi(c.Param("lost"))
+	if err != nil {
+		c.JSON(http.StatusBadRequest, models.Error{
+			Details: err.Error(),
+			Path:    "Item Service - removeItem()",
+			Object:  c.Param("id"),
+			Time:    time.Now(),
+		})
+		return
+	}
+	item, err := updateItemCapacity(itemId, lost)
 	if err != nil {
 		c.JSON(http.StatusBadRequest, err)
 		return

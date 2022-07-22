@@ -496,6 +496,14 @@ func borrowedItemLost(entryId int, diff int) (models.Item, error) {
 	if err != nil {
 		return models.Item{}, err
 	}
+	if diff <= 0 {
+		return models.Item{}, models.Error{
+			Details: "The amount of Items Lost has to be 1 or greater",
+			Path:    "Entry Service - borrowedItemLost()",
+			Object:  strconv.Itoa(diff),
+			Time:    time.Now(),
+		}
+	}
 	if entry.Capacity < diff {
 		return models.Item{}, models.Error{
 			Details: "You tried to return more, than you had initially borrowed",
@@ -515,7 +523,7 @@ func borrowedItemLost(entryId int, diff int) (models.Item, error) {
 			return models.Item{}, err
 		}
 	}
-	_, err = changeMemberBorrowCount(entry.MemberId, -diff)
+	_, err = changeMemberBorrowCount(entry.MemberId, diff)
 	if err != nil {
 		return models.Item{}, err
 	}

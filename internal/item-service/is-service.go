@@ -80,3 +80,23 @@ func updateItemAvailability(itemId int, diff int) (int, error) {
 	}
 	return itemId, nil
 }
+
+func updateItemCapacity(itemId, diff int) (models.Item, error) {
+	db, err := connect()
+	if err != nil {
+		return models.Item{}, err
+	}
+	_, err = db.getItemWithIdFromDB(itemId)
+	if err != nil {
+		return models.Item{}, err
+	}
+	err = db.updateCapacityInDB(itemId, -diff)
+	if err != nil {
+		return models.Item{}, err
+	}
+	item, err := db.getItemWithIdFromDB(itemId)
+	if err != nil {
+		return models.Item{}, err
+	}
+	return item, nil
+}
