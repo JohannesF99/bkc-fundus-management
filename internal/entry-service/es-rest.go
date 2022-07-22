@@ -31,7 +31,8 @@ func StartEntryService() {
 func allEntries(c *gin.Context) {
 	entries, err := getAllEntries()
 	if err != nil {
-		panic(err)
+		c.JSON(http.StatusBadRequest, err)
+		return
 	}
 	c.JSON(http.StatusOK, entries)
 }
@@ -39,11 +40,18 @@ func allEntries(c *gin.Context) {
 func singleEntry(c *gin.Context) {
 	entryId, err := strconv.Atoi(c.Param("entryId"))
 	if err != nil {
-		panic(err)
+		c.JSON(http.StatusBadRequest, models.Error{
+			Details: err.Error(),
+			Path:    "Entry Service - singleEntry()",
+			Object:  "",
+			Time:    time.Now(),
+		})
+		return
 	}
 	entry, err := getEntryForEntryId(entryId)
 	if err != nil {
-		panic(err)
+		c.JSON(http.StatusBadRequest, err)
+		return
 	}
 	c.JSON(http.StatusOK, entry)
 }
@@ -51,11 +59,18 @@ func singleEntry(c *gin.Context) {
 func allEntriesForMemberId(c *gin.Context) {
 	memberId, err := strconv.Atoi(c.Param("memberId"))
 	if err != nil {
-		panic(err)
+		c.JSON(http.StatusBadRequest, models.Error{
+			Details: err.Error(),
+			Path:    "Entry Service - allEntriesForMemberId()",
+			Object:  "",
+			Time:    time.Now(),
+		})
+		return
 	}
 	entries, err := getAllEntriesByMemberId(memberId)
 	if err != nil {
-		panic(err)
+		c.JSON(http.StatusBadRequest, err)
+		return
 	}
 	c.JSON(http.StatusOK, entries)
 }
@@ -63,11 +78,18 @@ func allEntriesForMemberId(c *gin.Context) {
 func allEntriesForItemId(c *gin.Context) {
 	itemId, err := strconv.Atoi(c.Param("itemId"))
 	if err != nil {
-		panic(err)
+		c.JSON(http.StatusBadRequest, models.Error{
+			Details: err.Error(),
+			Path:    "Entry Service - allEntriesForItemId()",
+			Object:  "",
+			Time:    time.Now(),
+		})
+		return
 	}
 	entries, err := getAllEntriesByItemId(itemId)
 	if err != nil {
-		panic(err)
+		c.JSON(http.StatusBadRequest, err)
+		return
 	}
 	c.JSON(http.StatusOK, entries)
 }
@@ -77,8 +99,8 @@ func newEntry(c *gin.Context) {
 	err := c.BindJSON(&newEntry)
 	if err != nil {
 		c.JSON(http.StatusBadRequest, models.Error{
-			Details: "Problem Binding Request Body",
-			Path:    "/v1/entry",
+			Details: err.Error(),
+			Path:    "Entry Service - newEntry()",
 			Object:  "",
 			Time:    time.Now(),
 		})
@@ -96,9 +118,9 @@ func changeEntry(c *gin.Context) {
 	entryId, err := strconv.Atoi(c.Param("entryId"))
 	if err != nil {
 		c.JSON(http.StatusBadRequest, models.Error{
-			Details: "Problem parsing Parameter Entry-ID",
-			Path:    "/v1/entry/:entryId",
-			Object:  c.Param("entryId"),
+			Details: err.Error(),
+			Path:    "Entry Service - changeEntry()",
+			Object:  "",
 			Time:    time.Now(),
 		})
 		return
@@ -106,9 +128,9 @@ func changeEntry(c *gin.Context) {
 	returned, err := strconv.Atoi(c.DefaultQuery("returned", "0"))
 	if err != nil {
 		c.JSON(http.StatusBadRequest, models.Error{
-			Details: "Problem parsing Parameter Returned",
-			Path:    "/v1/entry/:entryId",
-			Object:  c.DefaultQuery("returned", "0"),
+			Details: err.Error(),
+			Path:    "Entry Service - changeEntry()",
+			Object:  "",
 			Time:    time.Now(),
 		})
 		return
@@ -124,11 +146,18 @@ func changeEntry(c *gin.Context) {
 func removeEntry(c *gin.Context) {
 	entryId, err := strconv.Atoi(c.Param("entryId"))
 	if err != nil {
-		panic(err)
+		c.JSON(http.StatusBadRequest, models.Error{
+			Details: err.Error(),
+			Path:    "Entry Service - removeEntry()",
+			Object:  "",
+			Time:    time.Now(),
+		})
+		return
 	}
 	entry, err := deleteEntry(entryId)
 	if err != nil {
-		panic(err)
+		c.JSON(http.StatusBadRequest, err)
+		return
 	}
 	c.JSON(http.StatusOK, entry)
 }
@@ -137,8 +166,8 @@ func lostItem(c *gin.Context) {
 	entryId, err := strconv.Atoi(c.Param("entryId"))
 	if err != nil {
 		c.JSON(http.StatusBadRequest, models.Error{
-			Details: "Problems parsing Parameter Entry-ID",
-			Path:    "/v1/entry/:id/lost/:diff",
+			Details: err.Error(),
+			Path:    "Entry Service - lostItem()",
 			Object:  "",
 			Time:    time.Now(),
 		})
@@ -147,9 +176,9 @@ func lostItem(c *gin.Context) {
 	lost, err := strconv.Atoi(c.Param("lost"))
 	if err != nil {
 		c.JSON(http.StatusBadRequest, models.Error{
-			Details: "Problems parsing Parameter Diff",
-			Path:    "/v1/entry/:id/lost/:diff",
-			Object:  strconv.Itoa(entryId),
+			Details: err.Error(),
+			Path:    "Entry Service - lostItem()",
+			Object:  "",
 			Time:    time.Now(),
 		})
 		return
@@ -165,19 +194,27 @@ func lostItem(c *gin.Context) {
 func entryForMemberIdAndItemId(c *gin.Context) {
 	memberId, err := strconv.Atoi(c.Param("memberId"))
 	if err != nil {
-		panic(err)
+		c.JSON(http.StatusBadRequest, models.Error{
+			Details: err.Error(),
+			Path:    "Entry Service - entryForMemberIdAndItemId()",
+			Object:  "",
+			Time:    time.Now(),
+		})
+		return
 	}
 	itemId, err := strconv.Atoi(c.Param("itemId"))
 	if err != nil {
-		panic(err)
+		c.JSON(http.StatusBadRequest, models.Error{
+			Details: err.Error(),
+			Path:    "Entry Service - entryForMemberIdAndItemId()",
+			Object:  "",
+			Time:    time.Now(),
+		})
+		return
 	}
 	entry, err := getEntryForMemberIdAndItemId(memberId, itemId)
 	if err != nil {
-		c.JSON(http.StatusNotFound, gin.H{
-			"error":    "No matching entry could be found",
-			"memberId": memberId,
-			"itemId":   itemId,
-		})
+		c.JSON(http.StatusBadRequest, err)
 		return
 	}
 	c.JSON(http.StatusOK, entry)

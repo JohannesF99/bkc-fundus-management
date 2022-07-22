@@ -13,7 +13,6 @@ const ItemService = constants.ItemService
 const MemberService = constants.MemberService
 
 func deleteEntry(entryId int) (models.Entry, error) {
-	//TODO(Rollback)
 	db, err := connect()
 	if err != nil {
 		return models.Entry{}, err
@@ -40,12 +39,7 @@ func deleteEntry(entryId int) (models.Entry, error) {
 func createNewEntryOrUpdate(newEntryInfo models.NewEntryInfos) (models.Entry, error) {
 	db, err := connect()
 	if err != nil {
-		return models.Entry{}, models.Error{
-			Details: "Could not connect to Database",
-			Path:    "/v1/entry",
-			Object:  "",
-			Time:    time.Now(),
-		}
+		return models.Entry{}, err
 	}
 	_, err = doesMemberExist(newEntryInfo.MemberId)
 	if err != nil {
@@ -58,7 +52,7 @@ func createNewEntryOrUpdate(newEntryInfo models.NewEntryInfos) (models.Entry, er
 	if item.Availability < newEntryInfo.Capacity {
 		return models.Entry{}, models.Error{
 			Details: "Availability is greater then Capacity",
-			Path:    "/v1/entry",
+			Path:    "Entry Service - createNewEntryOrUpdate()",
 			Object:  item.String(),
 			Time:    time.Now(),
 		}
@@ -106,7 +100,7 @@ func changeItemAvailability(itemId int, returned int) (models.Item, error) {
 	if err != nil {
 		return models.Item{}, models.Error{
 			Details: err.Error(),
-			Path:    "changeItemAvailability",
+			Path:    "Entry Service - changeItemAvailability()",
 			Object:  "",
 			Time:    time.Now(),
 		}
@@ -116,7 +110,7 @@ func changeItemAvailability(itemId int, returned int) (models.Item, error) {
 	if err != nil {
 		return models.Item{}, models.Error{
 			Details: err.Error(),
-			Path:    "/v1/entry",
+			Path:    "Entry Service - changeItemAvailability",
 			Object:  "",
 			Time:    time.Now(),
 		}
@@ -134,8 +128,8 @@ func changeItemAvailability(itemId int, returned int) (models.Item, error) {
 	err = json.NewDecoder(resp.Body).Decode(&updatedItem)
 	if err != nil {
 		return models.Item{}, models.Error{
-			Details: "Problem parsing the Response Body to Struct",
-			Path:    "",
+			Details: err.Error(),
+			Path:    "Entry Service - changeItemAvailability",
 			Object:  "",
 			Time:    time.Now(),
 		}
@@ -151,7 +145,7 @@ func changeMemberBorrowCount(memberId int, returned int) (models.Member, error) 
 	if err != nil {
 		return models.Member{}, models.Error{
 			Details: err.Error(),
-			Path:    "/v1/entry/:entryId",
+			Path:    "Entry Service - changeMemberBorrowCount()",
 			Object:  strconv.Itoa(memberId),
 			Time:    time.Now(),
 		}
@@ -161,7 +155,7 @@ func changeMemberBorrowCount(memberId int, returned int) (models.Member, error) 
 	if err != nil {
 		return models.Member{}, models.Error{
 			Details: err.Error(),
-			Path:    "/v1/entry",
+			Path:    "Entry Service - changeMemberBorrowCount()",
 			Object:  "",
 			Time:    time.Now(),
 		}
@@ -180,7 +174,7 @@ func changeMemberBorrowCount(memberId int, returned int) (models.Member, error) 
 	if err != nil {
 		return models.Member{}, models.Error{
 			Details: err.Error(),
-			Path:    "/v1/entry/:entryId",
+			Path:    "Entry Service - changeMemberBorrowCount()",
 			Object:  strconv.Itoa(memberId),
 			Time:    time.Now(),
 		}
@@ -193,7 +187,7 @@ func doesMemberExist(memberId int) (models.Member, error) {
 	if err != nil {
 		return models.Member{}, models.Error{
 			Details: err.Error(),
-			Path:    "/v1/entry",
+			Path:    "Entry Service - doesMemberExist()",
 			Object:  "",
 			Time:    time.Now(),
 		}
@@ -211,8 +205,8 @@ func doesMemberExist(memberId int) (models.Member, error) {
 	err = json.NewDecoder(resp.Body).Decode(&existingMember)
 	if err != nil {
 		return models.Member{}, models.Error{
-			Details: "Error parsing Response Body to Struct",
-			Path:    "/v1/entry",
+			Details: err.Error(),
+			Path:    "Entry Service - doesMemberExist()",
 			Object:  "",
 			Time:    time.Now(),
 		}
@@ -225,7 +219,7 @@ func doesItemExist(itemId int) (models.Item, error) {
 	if err != nil {
 		return models.Item{}, models.Error{
 			Details: err.Error(),
-			Path:    "/v1/entry",
+			Path:    "Entry Service - doesItemExist()",
 			Object:  "",
 			Time:    time.Now(),
 		}
@@ -243,8 +237,8 @@ func doesItemExist(itemId int) (models.Item, error) {
 	err = json.NewDecoder(resp.Body).Decode(&itemInfo)
 	if err != nil {
 		return models.Item{}, models.Error{
-			Details: "Error parsing Response Body to Struct",
-			Path:    "/v1/entry",
+			Details: err.Error(),
+			Path:    "Entry Service - doesItemExist()",
 			Object:  "",
 			Time:    time.Now(),
 		}
@@ -283,12 +277,7 @@ func createNewEntry(newEntry models.NewEntryInfos) (models.Entry, error) {
 func getEntryForEntryId(entryId int) (models.Entry, error) {
 	db, err := connect()
 	if err != nil {
-		return models.Entry{}, models.Error{
-			Details: err.Error(),
-			Path:    "Update Entry - Database Connection failed",
-			Object:  "",
-			Time:    time.Now(),
-		}
+		return models.Entry{}, err
 	}
 	entry, err := db.getEntryForEntryIdFromDB(entryId)
 	if err != nil {
@@ -300,20 +289,23 @@ func getEntryForEntryId(entryId int) (models.Entry, error) {
 func updateEntry(entryId int, returned int) (models.Entry, error) {
 	db, err := connect()
 	if err != nil {
-		return models.Entry{}, models.Error{
-			Details: err.Error(),
-			Path:    "Update Entry - Database Connection failed",
-			Object:  "",
-			Time:    time.Now(),
-		}
+		return models.Entry{}, err
 	}
 	entry, err := getEntryForEntryId(entryId)
 	if err != nil {
 		return models.Entry{}, err
 	}
-	_, err = doesItemExist(entry.ItemId)
+	item, err := doesItemExist(entry.ItemId)
 	if err != nil {
 		return models.Entry{}, err
+	}
+	if item.Availability-returned > item.Capacity {
+		return models.Entry{}, models.Error{
+			Details: "You tried to return more, than you borrowed",
+			Path:    "Entry Service - updateEntry()",
+			Object:  item.String(),
+			Time:    time.Now(),
+		}
 	}
 	_, err = doesMemberExist(entry.MemberId)
 	if err != nil {
@@ -322,7 +314,7 @@ func updateEntry(entryId int, returned int) (models.Entry, error) {
 	if entry.Capacity < returned {
 		return models.Entry{}, models.Error{
 			Details: "You tried to return more, than you had initially borrowed",
-			Path:    "/v1/entry/:id",
+			Path:    "Entry Service - updateEntry()",
 			Object:  entry.String(),
 			Time:    time.Now(),
 		}
@@ -332,26 +324,21 @@ func updateEntry(entryId int, returned int) (models.Entry, error) {
 		if err != nil {
 			return models.Entry{}, err
 		}
-		return entry, models.Error{
-			Details: err.Error(),
-			Path:    "/v1/entry/:id",
-			Object:  entry.String(),
-			Time:    time.Now(),
-		}
-	}
-	entryId, err = db.updateEntryInDB(entryId, -returned)
-	if err != nil {
-		return models.Entry{}, err
-	}
-	entry, err = db.getEntryForEntryIdFromDB(entryId)
-	if err != nil {
-		return models.Entry{}, err
+		return entry, nil
 	}
 	_, err = changeItemAvailability(entry.ItemId, returned)
 	if err != nil {
 		return models.Entry{}, err
 	}
 	_, err = changeMemberBorrowCount(entry.MemberId, returned)
+	if err != nil {
+		return models.Entry{}, err
+	}
+	entryId, err = db.updateEntryInDB(entryId, -returned)
+	if err != nil {
+		return models.Entry{}, err
+	}
+	entry, err = db.getEntryForEntryIdFromDB(entryId)
 	if err != nil {
 		return models.Entry{}, err
 	}
@@ -363,11 +350,15 @@ func getAllEntriesByMemberId(memberId int) ([]models.Export, error) {
 	if err != nil {
 		return nil, err
 	}
+	_, err = doesMemberExist(memberId)
+	if err != nil {
+		return nil, err
+	}
 	allEntries, err := db.getEntriesForMemberIdFromDB(memberId)
 	if err != nil {
 		return nil, err
 	}
-	var itemInfosForMember []models.Export
+	itemInfosForMember := []models.Export{}
 	for _, entry := range allEntries {
 		item, err := requestItemFromItemService(entry.ItemId)
 		if err != nil {
@@ -386,13 +377,31 @@ func getAllEntriesByMemberId(memberId int) ([]models.Export, error) {
 func requestItemFromItemService(itemId int) (models.Item, error) {
 	resp, err := http.Get(ItemService + strconv.Itoa(itemId))
 	if err != nil {
-		return models.Item{}, err
+		return models.Item{}, models.Error{
+			Details: err.Error(),
+			Path:    "Entry Service - requestItemFromItemService",
+			Object:  "",
+			Time:    time.Now(),
+		}
+	}
+	if resp.StatusCode != 200 {
+		var apiError models.Error
+		err = json.NewDecoder(resp.Body).Decode(&apiError)
+		if err != nil {
+			return models.Item{}, err
+		}
+		return models.Item{}, apiError
 	}
 	defer resp.Body.Close()
 	var item models.Item
 	err = json.NewDecoder(resp.Body).Decode(&item)
 	if err != nil {
-		return models.Item{}, err
+		return models.Item{}, models.Error{
+			Details: err.Error(),
+			Path:    "Entry Service - requestItemFromItemService()",
+			Object:  "",
+			Time:    time.Now(),
+		}
 	}
 	return item, nil
 }
@@ -402,11 +411,15 @@ func getAllEntriesByItemId(itemId int) ([]models.Export, error) {
 	if err != nil {
 		return nil, err
 	}
+	_, err = doesItemExist(itemId)
+	if err != nil {
+		return nil, err
+	}
 	allEntries, err := db.getEntriesForItemIdFromDB(itemId)
 	if err != nil {
 		return nil, err
 	}
-	var memberInfosForItem []models.Export
+	memberInfosForItem := []models.Export{}
 	for _, entry := range allEntries {
 		member, err := requestMemberFromMemberService(entry.MemberId)
 		if err != nil {
@@ -425,13 +438,31 @@ func getAllEntriesByItemId(itemId int) ([]models.Export, error) {
 func requestMemberFromMemberService(memberId int) (models.Member, error) {
 	resp, err := http.Get(MemberService + strconv.Itoa(memberId))
 	if err != nil {
-		return models.Member{}, err
+		return models.Member{}, models.Error{
+			Details: err.Error(),
+			Path:    "Entry Service - requestMemberFromMemberService()",
+			Object:  "",
+			Time:    time.Now(),
+		}
+	}
+	if resp.StatusCode != 200 {
+		var apiError models.Error
+		err = json.NewDecoder(resp.Body).Decode(&apiError)
+		if err != nil {
+			return models.Member{}, err
+		}
+		return models.Member{}, apiError
 	}
 	defer resp.Body.Close()
 	var member models.Member
 	err = json.NewDecoder(resp.Body).Decode(&member)
 	if err != nil {
-		return models.Member{}, err
+		return models.Member{}, models.Error{
+			Details: err.Error(),
+			Path:    "Entry Service - requestMemberFromMemberService()",
+			Object:  "",
+			Time:    time.Now(),
+		}
 	}
 	return member, nil
 }
@@ -468,7 +499,7 @@ func borrowedItemLost(entryId int, diff int) (models.Item, error) {
 	if entry.Capacity < diff {
 		return models.Item{}, models.Error{
 			Details: "You tried to return more, than you had initially borrowed",
-			Path:    "/v1/entry/:id/lost/:id",
+			Path:    "Entry Service - borrowedItemLost()",
 			Object:  entry.String(),
 			Time:    time.Now(),
 		}
@@ -486,7 +517,7 @@ func borrowedItemLost(entryId int, diff int) (models.Item, error) {
 	}
 	_, err = changeMemberBorrowCount(entry.MemberId, -diff)
 	if err != nil {
-		panic(err)
+		return models.Item{}, err
 	}
 	item, err = changeItemCapacity(entry.ItemId, diff)
 	if err != nil {
@@ -501,17 +532,40 @@ func changeItemCapacity(itemId int, diff int) (models.Item, error) {
 		strconv.Itoa(itemId)+
 		"/lost/"+strconv.Itoa(diff), nil)
 	if err != nil {
-		return models.Item{}, err
+		return models.Item{}, models.Error{
+			Details: err.Error(),
+			Path:    "Entry Service - changeItemCapacity()",
+			Object:  "",
+			Time:    time.Now(),
+		}
 	}
 	resp, err := client.Do(req)
 	if err != nil {
-		return models.Item{}, nil
+		return models.Item{}, models.Error{
+			Details: err.Error(),
+			Path:    "Entry Service - changeItemCapacity()",
+			Object:  "",
+			Time:    time.Now(),
+		}
+	}
+	if resp.StatusCode != 200 {
+		var apiError models.Error
+		err = json.NewDecoder(resp.Body).Decode(&apiError)
+		if err != nil {
+			return models.Item{}, err
+		}
+		return models.Item{}, apiError
 	}
 	defer resp.Body.Close()
 	var item models.Item
 	err = json.NewDecoder(resp.Body).Decode(&item)
 	if err != nil {
-		return models.Item{}, err
+		return models.Item{}, models.Error{
+			Details: err.Error(),
+			Path:    "Entry Service - changeItemCapacity()",
+			Object:  "",
+			Time:    time.Now(),
+		}
 	}
 	return item, nil
 }
