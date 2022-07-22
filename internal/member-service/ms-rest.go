@@ -35,7 +35,7 @@ func StartMemberService() {
 		v1.PUT("/:id", updateBorrowCount)
 		v1.PUT("/:id/status/:status", changeStatus)
 	}
-	err = r.Run("localhost:8082")
+	err = r.Run("localhost:8083")
 	if err != nil {
 		panic(err)
 	}

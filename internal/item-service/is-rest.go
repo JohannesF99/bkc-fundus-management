@@ -36,7 +36,7 @@ func StartItemService() {
 		v1.PUT("/:id/lost/:lost", lostItem)
 		v1.DELETE("/:id", removeItem)
 	}
-	err = r.Run("localhost:8081")
+	err = r.Run("localhost:8082")
 	if err != nil {
 		panic(err)
 	}

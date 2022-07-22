@@ -40,7 +40,7 @@ func StartEntryService() {
 		v1.PUT("/:entryId/lost/:lost", lostItem)
 		v1.DELETE("/:entryId", removeEntry)
 	}
-	err = r.Run("localhost:8080")
+	err = r.Run("localhost:8081")
 	if err != nil {
 		panic(err)
 	}
