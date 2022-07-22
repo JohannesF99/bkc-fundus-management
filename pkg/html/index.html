@@ -6,7 +6,6 @@
 <body>
 <h1>BKC Fundus Überlick</h1>
 <table cellpadding="5" cellspacing="5">
-{{ range .entryList }}
     <tr>
         <th>Mitglieds-ID</th>
         <th>Name</th>
@@ -14,6 +13,7 @@
         <th>Anzahl</th>
         <th>Datum</th>
     </tr>
+    {{ range .entryList }}
     <tr>
         <td>{{ .MemberId }}</td>
         <td>{{ .MemberName }}</td>
@@ -21,7 +21,7 @@
         <td>{{ .ItemCapacity }}</td>
         <td>{{ .EntryDate }} </td>
     </tr>
-{{ end }}
+    {{ end }}
 </table>
 </body>
 </html>
