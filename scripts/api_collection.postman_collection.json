@@ -33,7 +33,7 @@
 						"method": "GET",
 						"header": [],
 						"url": {
-							"raw": "{{URL}}:8082/v1/member/{{MEMBER_ID}}",
+							"raw": "{{URL}}:8082/v1/member/1",
 							"host": [
 								"{{URL}}"
 							],
@@ -41,7 +41,7 @@
 							"path": [
 								"v1",
 								"member",
-								"{{MEMBER_ID}}"
+								"1"
 							]
 						}
 					},
@@ -81,7 +81,7 @@
 						"method": "PUT",
 						"header": [],
 						"url": {
-							"raw": "{{URL}}:8082/v1/member/{{MEMBER_ID}}?borrowed=4&returned=2",
+							"raw": "{{URL}}:8082/v1/member/1?returned=6",
 							"host": [
 								"{{URL}}"
 							],
@@ -89,16 +89,12 @@
 							"path": [
 								"v1",
 								"member",
-								"{{MEMBER_ID}}"
+								"1"
 							],
 							"query": [
 								{
-									"key": "borrowed",
-									"value": "4"
-								},
-								{
 									"key": "returned",
-									"value": "2"
+									"value": "6"
 								}
 							]
 						}
@@ -157,7 +153,7 @@
 						"method": "GET",
 						"header": [],
 						"url": {
-							"raw": "{{URL}}:8081/v1/item/{{MEMBER_ID}}",
+							"raw": "{{URL}}:8081/v1/item/1",
 							"host": [
 								"{{URL}}"
 							],
@@ -165,7 +161,7 @@
 							"path": [
 								"v1",
 								"item",
-								"{{MEMBER_ID}}"
+								"1"
 							]
 						}
 					},
@@ -205,7 +201,7 @@
 						"method": "PUT",
 						"header": [],
 						"url": {
-							"raw": "{{URL}}:8081/v1/item/{{MEMBER_ID}}?borrowed=5&returned=2",
+							"raw": "{{URL}}:8081/v1/item/1?returned=-1",
 							"host": [
 								"{{URL}}"
 							],
@@ -213,16 +209,12 @@
 							"path": [
 								"v1",
 								"item",
-								"{{MEMBER_ID}}"
+								"1"
 							],
 							"query": [
 								{
-									"key": "borrowed",
-									"value": "5"
-								},
-								{
 									"key": "returned",
-									"value": "2"
+									"value": "-1"
 								}
 							]
 						}
@@ -230,7 +222,7 @@
 					"response": []
 				},
 				{
-					"name": "Item Lost",
+					"name": "Change Item Capacity",
 					"request": {
 						"method": "PUT",
 						"header": [],
@@ -441,6 +433,28 @@
 									"key": "returned",
 									"value": "2"
 								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Item Lost",
+					"request": {
+						"method": "PUT",
+						"header": [],
+						"url": {
+							"raw": "{{URL}}:8080/v1/entry/1/lost/1",
+							"host": [
+								"{{URL}}"
+							],
+							"port": "8080",
+							"path": [
+								"v1",
+								"entry",
+								"1",
+								"lost",
+								"1"
 							]
 						}
 					},
