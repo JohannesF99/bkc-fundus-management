@@ -1,4 +1,4 @@
-package main
+package fundus
 
 import (
 	"bytes"
@@ -12,11 +12,13 @@ import (
 	"time"
 )
 
-const EntryService = constants.EntryService
-const ItemService = constants.ItemService
-const MemberService = constants.MemberService
+const (
+	EntryService  = constants.EntryService
+	ItemService   = constants.ItemService
+	MemberService = constants.MemberService
+)
 
-func main() {
+func StartFundusService() {
 	r := gin.Default()
 	accounts := readValidAccountsFromFile()
 	authorized := r.Group("/v1/fundus/", gin.BasicAuth(accounts))
