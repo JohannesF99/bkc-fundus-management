@@ -10,9 +10,9 @@ type Error struct {
 }
 
 func (e Error) Error() string {
-	return "Error{" +
-		"Details:" + e.Details +
-		", Path:" + e.Path +
-		", Object:" + e.Object +
-		"}"
+	return "Error[" +
+		"Details: " + e.Details +
+		", Path: " + e.Path +
+		", Object: " + e.Object +
+		"]"
 }
