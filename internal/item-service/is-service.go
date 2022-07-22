@@ -17,7 +17,7 @@ func deleteItem(itemId int) (models.Item, error) {
 	if item.Availability != item.Capacity {
 		return models.Item{}, models.Error{
 			Details: "You can only delete this Item, when every borrowed piece has been returned.",
-			Path:    "/v1/item/:id",
+			Path:    "Item Service - deleteItem()",
 			Object:  item.String(),
 			Time:    time.Now(),
 		}
