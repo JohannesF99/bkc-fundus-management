@@ -8,6 +8,7 @@ ITEM = cmd/item-service/main.go
 ITEM_OUT = item-service
 ENTRY = cmd/entry-service/main.go
 ENTRY_OUT = entry-service
+DIRECTORY = bkc-fundus-management
 ARCHIVE = bkc-fundus-management.zip
 
 fundus: Makefile $(FUNDUS)
@@ -27,15 +28,14 @@ entry: Makefile $(ENTRY)
 	mv main $(ENTRY_OUT)
 
 bundle: Makefile all
-	mkdir bin
-	mv $(MEMBER_OUT) $(ITEM_OUT) $(ENTRY_OUT) $(FUNDUS_OUT) bin/
-	cp -r pkg bin
-	cp -r scripts bin
-	rm -frv bin/pkg/constants bin/pkg/models
-	cd bin/
-	zip -r $(ARCHIVE) bin/
+	mkdir $(DIRECTORY)
+	mv $(MEMBER_OUT) $(ITEM_OUT) $(ENTRY_OUT) $(FUNDUS_OUT) $(DIRECTORY)
+	cp -r pkg $(DIRECTORY)
+	cp -r scripts $(DIRECTORY)
+	rm -frv $(DIRECTORY)/pkg/constants $(DIRECTORY)/pkg/models
+	zip -r $(ARCHIVE) $(DIRECTORY)
 
 clean:
-	rm -rvf $(MEMBER_OUT) $(ITEM_OUT) $(ENTRY_OUT) $(FUNDUS_OUT) bin/ $(ARCHIVE)
+	rm -rvf $(MEMBER_OUT) $(ITEM_OUT) $(ENTRY_OUT) $(FUNDUS_OUT) $(DIRECTORY) $(ARCHIVE)
 
 all: Makefile fundus member item entry
