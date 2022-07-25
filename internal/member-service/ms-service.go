@@ -26,6 +26,14 @@ func getMemberWithUserId(userId int) (models.Member, error) {
 	if err != nil {
 		return models.Member{}, err
 	}
+	if !member.Active {
+		return models.Member{}, models.Error{
+			Details: "Member does exist, but is currently marked as inactive",
+			Path:    "Member Service - getMemberWithUserId()",
+			Object:  member.String(),
+			Time:    time.Now(),
+		}
+	}
 	return member, nil
 }
 
