@@ -40,6 +40,10 @@ func StartEntryService() {
 		v1.PUT("/:entryId/lost/:lost", lostItem)
 		v1.DELETE("/:entryId", removeEntry)
 	}
+	_, err = gin.DefaultWriter.Write([]byte("Starting Entry Service on localhost:8081\n"))
+	if err != nil {
+		panic(err)
+	}
 	err = r.Run("localhost:8081")
 	if err != nil {
 		panic(err)

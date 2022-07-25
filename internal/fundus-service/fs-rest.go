@@ -58,6 +58,10 @@ func StartFundusService() {
 	{
 		public.GET("entries", showAllEntries)
 	}
+	_, err = gin.DefaultWriter.Write([]byte("Starting Fundus Service on Port 8080\n"))
+	if err != nil {
+		panic(err)
+	}
 	err = r.Run(":8080")
 	if err != nil {
 		panic(err)

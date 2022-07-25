@@ -36,6 +36,10 @@ func StartItemService() {
 		v1.PUT("/:id/lost/:lost", lostItem)
 		v1.DELETE("/:id", removeItem)
 	}
+	_, err = gin.DefaultWriter.Write([]byte("Starting Item Service on localhost:8082\n"))
+	if err != nil {
+		panic(err)
+	}
 	err = r.Run("localhost:8082")
 	if err != nil {
 		panic(err)

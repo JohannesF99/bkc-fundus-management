@@ -35,6 +35,10 @@ func StartMemberService() {
 		v1.PUT("/:id", updateBorrowCount)
 		v1.PUT("/:id/status/:status", changeStatus)
 	}
+	_, err = gin.DefaultWriter.Write([]byte("Starting Member Service on localhost:8083\n"))
+	if err != nil {
+		panic(err)
+	}
 	err = r.Run("localhost:8083")
 	if err != nil {
 		panic(err)
