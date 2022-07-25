@@ -649,6 +649,9 @@ func getEntriesForAllMember() ([]models.ExpandedExport, error) {
 	}
 	entryExportList := []models.ExpandedExport{}
 	for _, member := range memberList {
+		if !member.Active {
+			continue
+		}
 		entries, err := getAllEntriesByMemberId(member.Id)
 		if err != nil {
 			return nil, err
